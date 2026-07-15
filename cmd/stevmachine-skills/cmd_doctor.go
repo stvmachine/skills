@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/stevmachine/skills/internal/vault"
+	"github.com/stvmachine/skills/internal/vault"
 )
 
 func cmdDoctor() {

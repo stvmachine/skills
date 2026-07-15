@@ -1,4 +1,4 @@
-module github.com/stevmachine/skills
+module github.com/stvmachine/skills
 
 go 1.22
 

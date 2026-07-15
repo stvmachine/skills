@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/huh"
-	"github.com/stevmachine/skills/internal/vault"
+	"github.com/stvmachine/skills/internal/vault"
 )
 
 

@@ -13,8 +13,8 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/stevmachine/skills/internal/mcp"
-	"github.com/stevmachine/skills/packages"
+	"github.com/stvmachine/skills/internal/mcp"
+	"github.com/stvmachine/skills/packages"
 )
 
 type installResult struct {

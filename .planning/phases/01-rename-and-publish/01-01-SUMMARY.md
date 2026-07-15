@@ -6,7 +6,7 @@ tags: [go, module, rename, vault]
 
 requires:
 provides:
-  - Go module path renamed to github.com/stevmachine/skills
+  - Go module path renamed to github.com/stvmachine/skills
   - CLI directory and binary renamed to stevmachine-skills
   - Vault default directory renamed to ~/.stevmachine-skills
 affects:
@@ -40,7 +40,7 @@ requirements-completed:
 
 coverage:
   - id: D1
-    description: "Go module path and package imports renamed to github.com/stevmachine/skills"
+    description: "Go module path and package imports renamed to github.com/stvmachine/skills"
     requirement: RENAME-01
     verification:
       - kind: other
@@ -82,7 +82,7 @@ status: complete
 - **Files modified:** 8
 
 ## Accomplishments
-- Changed `go.mod` module path to `github.com/stevmachine/skills`
+- Changed `go.mod` module path to `github.com/stvmachine/skills`
 - Renamed `cmd/medtasker-skills/` directory to `cmd/stevmachine-skills/`
 - Updated all internal Go imports to use the new module path
 - Renamed CLI usage strings, TUI titles, and default skill names to `stevmachine-*`

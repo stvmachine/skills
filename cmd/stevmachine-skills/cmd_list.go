@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/stevmachine/skills/internal/mcp"
-	"github.com/stevmachine/skills/packages"
+	"github.com/stvmachine/skills/internal/mcp"
+	"github.com/stvmachine/skills/packages"
 )
 
 func cmdList() {
