@@ -2,7 +2,7 @@
 
 A minimal distribution system for Stevmachine [skills](https://docs.claude.com/en/docs/claude-code/skills) and [MCP servers](https://modelcontextprotocol.io) in Claude Code, with credentials backed by [dotenvx](https://github.com/dotenvx/dotenvx).
 
-> **Demo assets:** The animated demo and setup-flow screenshots are being regenerated with the new `stevmachine-skills` branding and will be added in a follow-up phase.
+![demo](docs/assets/demo.gif)
 
 The whole tool does three things:
 
@@ -30,6 +30,8 @@ stevmachine-skills install
 # Interactive credential setup
 stevmachine-skills env setup
 ```
+
+![setup flow](docs/assets/setup-flow.png)
 
 If you'd rather not put the binary on PATH, every `stevmachine-skills <cmd>` line below is equivalent to `go run ./cmd/stevmachine-skills <cmd>` from inside the repo.
 
