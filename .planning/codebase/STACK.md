@@ -5,7 +5,7 @@
 ## Languages
 
 **Primary:**
-- Go 1.22 (declared in `go.mod`), Go 1.26.5 (observed runtime) — entire CLI and embedded package distribution.
+- Go 1.22 (declared in `go.mod`) — entire CLI and embedded package distribution.
 
 **Secondary:**
 - Markdown — skill definitions (SKILL.md with YAML frontmatter).
@@ -43,8 +43,8 @@
 - `scripts/install.sh` — full installer (dotenvx + binary + skills).
 - `scripts/verify-install.sh` — post-install sanity check.
 - `tapes/generate.sh` — README asset generation (requires `freeze`, `vhs`, `ffmpeg`, `ttyd`).
-- `packages/claude-plugin/skills/run-medtasker-skills/smoke.sh` — smoke tests for non-interactive surfaces.
-- `packages/claude-plugin/skills/run-medtasker-skills/wizard.sh` — TUI wizard driver via tmux.
+- `packages/claude-plugin/skills/run-stevmachine-skills/smoke.sh` — smoke tests for non-interactive surfaces.
+- `packages/claude-plugin/skills/run-stevmachine-skills/wizard.sh` — TUI wizard driver via tmux.
 
 ## Key Dependencies
 
@@ -71,14 +71,14 @@
 
 **Environment:**
 - No `.env` files read by the Go binary itself.
-- `dotenvx` manages the user's credential vault at `~/.medtasker-skills/.env`.
-- `MEDTASKER_TICKET_DIR` — optional directory for filesystem ticket storage backend.
-- `MEDTASKER_FORCE_FILESYSTEM=1` — forces filesystem backend even if `bd` is installed.
-- `MEDTASKER_VAULT` — optional custom vault path mentioned in README wrapper examples (not consumed by Go code directly).
-- `MEDTASKER_REPO` — used by `smoke.sh` and `wizard.sh` to locate source repo.
+- `dotenvx` manages the user's credential vault at `~/.stevmachine-skills/.env`.
+- `STEVMACHINE_TICKET_DIR` — optional directory for filesystem ticket storage backend.
+- `STEVMACHINE_FORCE_FILESYSTEM=1` — forces filesystem backend even if `bd` is installed.
+- `STEVMACHINE_VAULT` — optional custom vault path mentioned in README wrapper examples (not consumed by Go code directly).
+- `STEVMACHINE_REPO` — used by `smoke.sh` and `wizard.sh` to locate source repo.
 
 **Build:**
-- `go.mod` — module declaration (`github.com/nimblic/medtasker-skills`), Go version 1.22.
+- `go.mod` — module declaration (`github.com/stvmachine/skills`), Go version 1.22.
 - `go.sum` — dependency checksums.
 - No `Makefile`, `Taskfile`, or CI configuration detected.
 - `.rtk/filters.toml` — empty RTK filter template.
@@ -88,12 +88,12 @@
 **Development:**
 - Go 1.22+.
 - Node.js + npm for `dotenvx` and Claude Code.
-- SSH access to `github.com/nimblic/medtasker-skills` (private repo).
+- Git clone access to `github.com/stvmachine/skills` (public repo).
 - Optional: `tmux`, `beads-mcp`, `rtk`, `uv`, `vhs`, `freeze`, `ffmpeg`, `ttyd`.
 
 **Production:**
 - No server-side production deployment; this is a client-side CLI.
-- Distribution is "clone + build" from a private repo; `go install` and `curl | bash` are intentionally unsupported.
+- Distribution is "clone + build" from the public repo; `go install` and `curl | bash` are intentionally unsupported.
 
 ---
 

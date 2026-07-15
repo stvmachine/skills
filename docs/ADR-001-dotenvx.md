@@ -6,7 +6,7 @@
 
 ## Context
 
-The stevmachine-skills project is building a skill distribution system for AI agent platforms (Claude Code, OpenCode, skill.fish). The system manages MCP server credentials for services including Jira, GitHub, Figma, and Confluence.
+The stevmachine-skills project is a skill distribution system for Claude Code (and, in Phase 2, OpenCode). The system manages MCP server credentials for services including Jira, GitHub, Figma, and Confluence.
 
 The access pattern is what drives the design: Claude Code reads `~/.claude/.mcp.json` and expands `${VAR}` references from its own process environment when it spawns an MCP server. So whatever stores the secrets at rest must be able to inject them into the env of the `claude` process at launch time, without ever writing plaintext to disk.
 
@@ -60,36 +60,22 @@ Layering native stores in front of the vault also created a coherence problem: i
 
 ### Positive Consequences
 
-1. **Dramatically Reduced Breach Risk**: ECIES encryption provides 200× lower breach risk versus centralized storage (99.5% reduction). Even if the vault file is exposed, secrets remain encrypted.
-
-2. **AI-Safe Credentials**: Encrypted files protect against AI coding tools (Claude Code, GitHub Copilot, etc.) reading secrets when processing files in context. This is critical as stevmachine-skills integrates deeply with AI agent platforms.
-
-3. **Zero Infrastructure**: Unlike cloud-based secret managers, dotenvx requires no servers, no SaaS subscriptions, and no network access. Secrets are stored in git alongside code.
-
+1. **Dramatically Reduced Breach Risk**: ECIES encryption provides strong protection versus centralized storage. Even if the vault file is exposed, secrets remain encrypted.
+2. **AI-Safe Credentials**: Encrypted files protect against AI coding tools reading secrets when processing files in context. This is critical as stevmachine-skills integrates deeply with AI agent platforms.
+3. **Zero Infrastructure**: Unlike cloud-based secret managers, dotenvx requires no servers, no SaaS subscriptions, and no network access. Secrets are stored locally.
 4. **Cross-Platform Consistency**: Works identically on macOS, Linux, and Windows. Eliminates platform-specific credential store fragmentation.
-
 5. **Free and Open Source**: No per-user licensing costs. Suitable for open-source distribution and community contributions.
-
 6. **Cryptographic Separation**: The encrypted secrets file and decryption key are stored separately. An attacker must compromise both to access plaintext secrets.
-
 7. **Environment Branching**: Native support for `.env.development`, `.env.production`, etc., aligned with modern deployment practices.
-
-8. **Future-Proof for Agentic Storage**: dotenvx is developing Agentic Secret Storage (AS2) for autonomous software — aligned with stevmachine-skills' AI-native architecture.
-
-9. **Industry Validation**: Adopted by major organizations including NASA (Earthdata Search), Supabase, AWS Amplify Gen 2, Cloudflare, and PayPal.
+8. **Industry Validation**: Adopted by organizations including NASA (Earthdata Search), Supabase, AWS Amplify Gen 2, Cloudflare, and PayPal.
 
 ### Negative Consequences
 
 1. **Key Management Overhead**: Users must securely manage decryption keys (e.g., via password manager, hardware token, or platform keychain). Losing the key means losing access to credentials.
-
 2. **New Dependency**: Adds a Node.js-based tool dependency. While lightweight, this introduces a supply chain consideration.
-
 3. **Migration Effort**: Existing plaintext `.env` files must be encrypted. Users need education on the new workflow.
-
 4. **No Centralized Access Control**: Unlike HashiCorp Vault or Doppler, dotenvx does not provide RBAC, audit logs, or secret rotation policies. Access is binary (have key / don't have key).
-
 5. **CLI-First Interface**: Primarily command-line driven. Less friendly for non-technical users compared to GUI vault applications.
-
 6. **Recovery Complexity**: No "forgot password" flow. Key loss = permanent secret loss. Requires backup discipline.
 
 ## Alternatives Considered
@@ -141,45 +127,26 @@ Layering native stores in front of the vault also created a coherence problem: i
 ## References
 
 1. **[dotenvx Official Repository](https://github.com/dotenvx/dotenvx)** — Core project documentation and CLI reference
-
-2. **[NASA Earthdata Search](https://github.com/nasa/earthdata-search)** (813 stars)
-   - Uses `dotenvx run` in package.json scripts for API server startup
-   - Provides cross-platform consistency for mission-critical Earth science data operations
-   - Demonstrates production reliability in scientific computing environments
-
-3. **[Supabase](https://github.com/supabase/supabase)** (103k+ stars)
-   - Official documentation recommends dotenvx for branching integration
-   - Encrypted secrets committed to git, decrypted at deploy time
-   - Zero CI code — no custom scripts needed for secrets management
-   - Native integration with Supabase branching executor
-
-4. **[AWS Amplify Gen 2](https://docs.amplify.aws/)**
-   - Official AWS documentation explicitly recommends dotenvx
-   - Used for local development with sandbox environments
-   - Example workflow: `npx dotenvx run --env-file=.env.local -- ampx sandbox`
-
-5. **[Cloudflare Workers & Pages](https://developers.cloudflare.com/)**
-   - Official documentation for edge runtime integration
-   - Encrypted `.env` files imported directly into Worker entrypoints
-   - Private keys set as Worker secrets via Wrangler
-
-6. **[PayPal](https://www.paypal.com/)** — Mentioned as adopter in dotenvx 1M installs blog post, demonstrating enterprise fintech validation
-
-7. **[dotenvx 1M Installs Blog Post](https://dotenvx.com/blog/2024/06/24/dotenvx-1m-installs.html)** — Overview of adoption milestones and feature roadmap including Agentic Secret Storage (AS2)
-
+2. **[NASA Earthdata Search](https://github.com/nasa/earthdata-search)** — Uses `dotenvx run` for API server startup
+3. **[Supabase](https://github.com/supabase/supabase)** — Recommends dotenvx for branching integration
+4. **[AWS Amplify Gen 2](https://docs.amplify.aws/)** — Official AWS documentation recommends dotenvx
+5. **[Cloudflare Workers & Pages](https://developers.cloudflare.com/)** — Edge runtime integration docs
+6. **[PayPal](https://www.paypal.com/)** — Mentioned as adopter in dotenvx 1M installs blog post
+7. **[dotenvx 1M Installs Blog Post](https://dotenvx.com/blog/2024/06/24/dotenvx-1m-installs.html)** — Adoption milestones and feature roadmap
 8. **[dotenvx Documentation: Encryption](https://dotenvx.com/docs/features/encryption)** — Technical details on ECIES implementation (secp256k1 + AES-256-GCM)
 
 ## Notes
 
-- This ADR should be reviewed after 3 months of production use to validate key management workflows and user adoption
-- Consider contributing to dotenvx's Agentic Secret Storage (AS2) initiative as it aligns with stevmachine-skills' autonomous AI architecture
-- Monitor for native Python bindings or alternatives if Node.js dependency becomes problematic for pure-Python environments
+- This ADR should be reviewed after 3 months of production use to validate key management workflows and user adoption.
+- Monitor for standalone or non-Node distribution options if the Node.js dependency becomes problematic.
 
 ## Follow-up Implementation Work
 
-This ADR change implies code changes that have not yet landed:
+This ADR implies the following implementation work:
 
-- Remove the `CredentialManager` Keychain / Secret Service / Windows Credential Manager branches in `src/installer/credentials.py`; route all reads/writes through `DotenvxVaultManager`.
-- Drop the `keyring` and `pywin32` optional dependencies.
-- Update installer/CLI surfaces so `stevmachine-skills env set/get/list` are vault-only.
+- Route all credential reads/writes through the `dotenvx` vault in `internal/vault`.
+- Ensure `stevmachine-skills env set/get/list` are vault-only operations.
 - Document the launcher (shell function or wrapper script) that runs `dotenvx run -f ~/.stevmachine-skills/.env -- claude` so users don't have to type it.
+
+---
+*Decision date: 2026-07-15*

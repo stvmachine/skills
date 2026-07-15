@@ -5,21 +5,21 @@
 ## Tech Debt
 
 **Claude-Only Platform Coupling:**
-- Issue: The entire distribution is hardcoded to Claude Code. `packages/claude-plugin/` is the only implemented package; `packages/opencode-package/` and `packages/skillfish-package/` from `DESIGN.md` do not exist.
-- Files: `cmd/medtasker-skills/cmd_install.go`, `cmd_list.go`, `cmd_doctor.go`, `packages/embed.go`.
+- Issue: The entire distribution is hardcoded to Claude Code. `packages/claude-plugin/` is the only implemented package; `packages/opencode-package/` from early design drafts does not exist.
+- Files: `cmd/stevmachine-skills/cmd_install.go`, `cmd_list.go`, `cmd_doctor.go`, `packages/embed.go`.
 - Impact: Supporting OpenCode or other platforms requires a significant refactor, not just adding new packages.
 - Fix approach: Introduce a platform interface (`PlatformInstaller`) and per-platform embed directories; route `install`/`list`/`doctor` through the platform abstraction.
 
 **Hardcoded Branding Strings:**
-- Issue: `medtasker`, `claude`, and `Claude Code` strings are scattered throughout the codebase, making rename or white-label expensive.
+- Issue: `stevmachine`, `claude`, and `Claude Code` strings are scattered throughout the codebase, making rename or white-label expensive.
 - Files:
-  - `cmd/medtasker-skills/cmd_install.go:88` — `Medtasker Skills` title.
-  - `cmd/medtasker-skills/cmd_install.go:136-140` — `~/.claude`, `~/.claude.json`.
-  - `cmd/medtasker-skills/cmd_install.go:144` — `Claude Code not detected`.
-  - `cmd/medtasker-skills/cmd_install.go:205` — default skill names all prefixed `medtasker-`.
-  - `cmd/medtasker-skills/cmd_doctor.go:14-15,27` — `Claude Code dir` and `~/.claude/.mcp.json`.
-  - `cmd/medtasker-skills/cmd_env.go:224-225` — launch Claude command.
-  - `internal/vault/vault.go:19` — `~/.medtasker-skills`.
+  - `cmd/stevmachine-skills/cmd_install.go:88` — `Stevmachine Skills` title.
+  - `cmd/stevmachine-skills/cmd_install.go:136-140` — `~/.claude`, `~/.claude.json`.
+  - `cmd/stevmachine-skills/cmd_install.go:144` — `Claude Code not detected`.
+  - `cmd/stevmachine-skills/cmd_install.go:205` — default skill names all prefixed `stevmachine-`.
+  - `cmd/stevmachine-skills/cmd_doctor.go:14-15,27` — `Claude Code dir` and `~/.claude/.mcp.json`.
+  - `cmd/stevmachine-skills/cmd_env.go:224-225` — launch Claude command.
+  - `internal/vault/vault.go:19` — `~/.stevmachine-skills`.
   - `packages/embed.go:5` — `//go:embed all:claude-plugin/skills`.
   - `scripts/install.sh`, `scripts/verify-install.sh`, `tapes/setup-flow.sh`, `docs/INSTALL.md` — numerous references.
 - Impact: A product rename or dual-platform release would require a wide, error-prone string sweep.
@@ -32,35 +32,35 @@
 - Fix approach: Deep-merge server entries (env, args, headers) or detect conflicts and prompt/fail.
 
 **Missing Vault Directory Initialization:**
-- Issue: `vault.Manager.Set` and `cmdEnvSetup` do not ensure `~/.medtasker-skills` exists before invoking `dotenvx` with `cmd.Dir = EnvDir`.
-- Files: `internal/vault/vault.go:105-112`, `cmd/medtasker-skills/cmd_env.go:188-200`.
+- Issue: `vault.Manager.Set` and `cmdEnvSetup` do not ensure `~/.stevmachine-skills` exists before invoking `dotenvx` with `cmd.Dir = EnvDir`.
+- Files: `internal/vault/vault.go:105-112`, `cmd/stevmachine-skills/cmd_env.go:188-200`.
 - Impact: On a fresh machine, `env set` or `env setup` fails with `chdir … no such file or directory`.
 - Fix approach: Call `os.MkdirAll(EnvDir, 0o700)` at the start of every public vault method, or create a lazy initialization helper.
 
 **Vault Initialization Checks Wrong File:**
 - Issue: `IsInitialized` checks for the existence of `.env.keys`, but modern `dotenvx` (≥1.66) stores the private key in the system keyring and does not write `.env.keys` by default.
-- Files: `internal/vault/vault.go:37-40`, `cmd/medtasker-skills/cmd_doctor.go:29`.
-- Impact: `medtasker-skills env list` reports `No vault initialized` even when the vault is populated and encrypted.
+- Files: `internal/vault/vault.go:37-40`, `cmd/stevmachine-skills/cmd_doctor.go:29`.
+- Impact: `stevmachine-skills env list` reports `No vault initialized` even when the vault is populated and encrypted.
 - Fix approach: Check for the existence of `.env` (encrypted) or test `dotenvx get` instead of relying on the legacy keys file.
 
 **Dependency Resolution Not Implemented:**
-- Issue: `DESIGN.md` describes a dependency resolver with topological sort, but the CLI does not parse `dependencies:` from skill frontmatter or resolve installation order.
-- Files: `cmd/medtasker-skills/cmd_install.go:157-160`.
-- Impact: `medtasker-jira-ticket-transition` depends on `commit`, `medtasker-jira`, and `medtasker-jira-markup`, but installing it alone will not install those dependencies.
+- Issue: `ROADMAP.md` plans a dependency resolver for Phase 3, but the CLI does not yet parse `dependencies:` from skill frontmatter or resolve installation order.
+- Files: `cmd/stevmachine-skills/cmd_install.go:157-160`.
+- Impact: `stevmachine-jira-ticket-transition` depends on `commit`, `stevmachine-jira`, and `stevmachine-jira-markup`, but installing it alone will not install those dependencies.
 - Fix approach: Parse `dependencies` from `SkillFrontmatter`, build a graph, and install in topological order before the requested skill.
 
 ## Known Bugs
 
 **TUI Emits ANSI in Piped Output:**
-- Symptoms: `medtasker-skills install` runs `tea.NewProgram(...).Run()` first; only if that returns an error does it fall back to plain output. Piped output therefore contains escape sequences.
-- Files: `cmd/medtasker-skills/cmd_install.go:162-184`.
-- Trigger: Run `medtasker-skills install | cat` or capture output in a script.
+- Symptoms: `stevmachine-skills install` runs `tea.NewProgram(...).Run()` first; only if that returns an error does it fall back to plain output. Piped output therefore contains escape sequences.
+- Files: `cmd/stevmachine-skills/cmd_install.go:162-184`.
+- Trigger: Run `stevmachine-skills install | cat` or capture output in a script.
 - Workaround: The `smoke.sh` test greps for keywords rather than comparing byte-for-byte.
 - Fix approach: Detect non-TTY before starting the TUI and skip the Bubble Tea program entirely.
 
 **MCP Config Written to Two Files with No Precedence Logic:**
 - Symptoms: `install` writes to both `~/.claude/.mcp.json` and `~/.claude.json`. The ADR says `~/.claude.json` takes precedence, but the code only loops and writes to both.
-- Files: `cmd/medtasker-skills/cmd_install.go:138-140`, `internal/mcp/mcp.go:116-137`.
+- Files: `cmd/stevmachine-skills/cmd_install.go:138-140`, `internal/mcp/mcp.go:116-137`.
 - Trigger: Every install.
 - Workaround: Users must manually reconcile if the two files diverge.
 - Fix approach: Write to a single canonical location or read the precedence file first and merge into it, then copy to the fallback if needed.
@@ -89,32 +89,32 @@
 
 **Synchronous Sequential Installs:**
 - Problem: `install` processes skills one at a time in a single goroutine.
-- Files: `cmd/medtasker-skills/cmd_install.go:54-62`.
+- Files: `cmd/stevmachine-skills/cmd_install.go:54-62`.
 - Cause: Each skill is installed and its MCP config written before the next begins.
 - Improvement path: With only a handful of small skills, this is fine. If the skill catalog grows, consider copying files in parallel and merging MCP configs once at the end.
 
 **Large Embedded SKILL.md Files:**
 - Problem: Skill Markdown files are hundreds of lines and include detailed workflow rules, increasing binary size and compile time modestly.
-- Files: `packages/claude-plugin/skills/medtasker-jira/SKILL.md`, `medtasker-jira-ticket-transition/SKILL.md`.
+- Files: `packages/claude-plugin/skills/stevmachine-jira/SKILL.md`, `stevmachine-jira-ticket-transition/SKILL.md`.
 - Cause: Skills are embedded verbatim.
 - Improvement path: Compress or split rule files; only embed what the CLI needs at runtime (frontmatter can be extracted at build time).
 
 ## Fragile Areas
 
 **Skill Discovery via Embedded Directory Name:**
-- Files: `cmd/medtasker-skills/cmd_install.go:209`, `cmd_list.go:34`.
+- Files: `cmd/stevmachine-skills/cmd_install.go:209`, `cmd_list.go:34`.
 - Why fragile: Skills are discovered by walking `claude-plugin/skills/` inside the embedded FS. Renaming the package directory or adding a new platform requires updating every discovery site.
 - Safe modification: Add a `const skillsDir = "claude-plugin/skills"` and use it everywhere.
 - Test coverage: Only `smoke.sh` covers discovery; no unit tests.
 
 **Default Skill List Hardcoded:**
-- Files: `cmd/medtasker-skills/cmd_install.go:204-206`.
-- Why fragile: New skills must be added to this slice manually or they will not be installed by `medtasker-skills install` without explicit arguments.
+- Files: `cmd/stevmachine-skills/cmd_install.go:204-206`.
+- Why fragile: New skills must be added to this slice manually or they will not be installed by `stevmachine-skills install` without explicit arguments.
 - Safe modification: Derive the default list from the embedded FS at runtime.
-- Test coverage: `smoke.sh` checks that `medtasker-jira` is in `list`, but not the default install set.
+- Test coverage: `smoke.sh` checks that `stevmachine-jira` is in `list`, but not the default install set.
 
 **RTK and Beads Suggestions Are macOS-Centric:**
-- Files: `cmd/medtasker-skills/cmd_doctor.go:73-89`, `scripts/install.sh` (implicit), `docs/ADR-003-rtk.md`, `docs/ADR-004-beads.md`.
+- Files: `cmd/stevmachine-skills/cmd_doctor.go:73-89`, `scripts/install.sh` (implicit), `docs/ADR-003-rtk.md`, `docs/ADR-004-beads.md`.
 - Why fragile: Suggestions use `brew install rtk` and a curl-based beads installer, which do not apply to all platforms.
 - Safe modification: Detect `runtime.GOOS` and print appropriate install instructions.
 - Test coverage: No tests for suggestion output.
@@ -146,7 +146,7 @@
 ## Missing Critical Features
 
 **Multi-Platform Support:**
-- Problem: `DESIGN.md` promises Claude Code, OpenCode, and skill.fish packages; only Claude Code exists.
+- Problem: Only Claude Code is implemented today. OpenCode is planned for Phase 2.
 - Blocks: Distribution to non-Claude users.
 
 **Dependency Resolver:**
@@ -154,7 +154,7 @@
 - Blocks: Skills that rely on other skills cannot be installed safely with a single command.
 
 **Update Command:**
-- Problem: `DESIGN.md` mentions `medtasker-skills update`, but the CLI does not implement it.
+- Problem: The roadmap includes an `update` command, but the CLI does not implement it yet.
 - Blocks: No first-class upgrade path for installed skills.
 
 **CI/CD Pipeline:**
@@ -165,7 +165,7 @@
 
 **Untested CLI surface:**
 - What's not tested: Subcommand parsing, exit codes, install TUI fallback, env setup form, doctor output.
-- Files: `cmd/medtasker-skills/*.go`.
+- Files: `cmd/stevmachine-skills/*.go`.
 - Risk: Refactoring commands can break user-facing behavior without failing tests.
 - Priority: High.
 

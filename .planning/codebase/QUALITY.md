@@ -84,7 +84,7 @@ func TestParseSkillMcpConfig(t *testing.T) {
 - `cmd` package — no tests exist.
 
 **Integration Tests:**
-- `smoke.sh` (`packages/claude-plugin/skills/run-medtasker-skills/smoke.sh`) exercises the full CLI build/install/list/doctor/env path against an isolated `$HOME`.
+- `smoke.sh` (`packages/claude-plugin/skills/run-stevmachine-skills/smoke.sh`) exercises the full CLI build/install/list/doctor/env path against an isolated `$HOME`.
 - `wizard.sh` drives the `huh` TUI end-to-end through tmux.
 
 **E2E Tests:**
@@ -132,7 +132,7 @@ func TestParseSkillMcpConfig(t *testing.T) {
 2. Blank line.
 3. Third-party (`github.com/charmbracelet/...`, `gopkg.in/yaml.v3`).
 4. Blank line.
-5. Project internal (`github.com/nimblic/medtasker-skills/internal/mcp`, `.../packages`).
+5. Project internal (`github.com/stvmachine/skills/internal/mcp`, `.../packages`).
 
 **Path Aliases:** None.
 
@@ -188,7 +188,7 @@ func TestParseSkillMcpConfig(t *testing.T) {
 1. **No tests for `cmd` package.** The CLI surface (parsing, exit codes, env subcommand dispatch) is untested by Go tests; only `smoke.sh` covers it.
 2. **Tests depend on external `dotenvx`.** `vault_test.go` skips or fails when `dotenvx` is unavailable, making CI non-deterministic unless the tool is pre-installed.
 3. **No linting or CI gate.** There is no automated style, vet, or static-analysis check.
-4. **Large generated skill files are embedded.** Skill Markdown files are long and contain hardcoded organization-specific references (e.g., `medtasker.atlassian.net`, `medtasker-frontends`), which may leak context if not reviewed.
+4. **Large embedded skill files are embedded.** Skill Markdown files are long and may contain project-specific references, which can leak context if not reviewed before embedding.
 
 ---
 

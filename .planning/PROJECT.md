@@ -16,7 +16,7 @@ Steve can own, ship, and update his personal AI assistant skills from one repo w
 - ✓ Copy skill packages into `~/.claude/skills/` — existing
 - ✓ Parse `SKILL.md` YAML frontmatter for MCP servers — existing
 - ✓ Merge MCP servers into `~/.claude/.mcp.json` with literal `${VAR}` placeholders — existing
-- ✓ Encrypted credential vault via `dotenvx` under `~/.medtasker-skills/` — existing
+- ✓ Encrypted credential vault via `dotenvx` under `~/.stevmachine-skills/` — existing
 - ✓ `install`, `list`, `doctor`, and `env` subcommands — existing
 
 ### Active
@@ -31,22 +31,13 @@ Steve can own, ship, and update his personal AI assistant skills from one repo w
 - [ ] **OPENCODE-02**: Add OpenCode-specific package layout and manifest handling without breaking Claude Code support.
 - [ ] **OPENCODE-03**: Preserve the `dotenvx` credential model for OpenCode MCP server variables.
 
-### Out of Scope
-
-- **skill.fish / other platforms** — DESIGN.md mentions these, but only Claude Code and OpenCode are needed for v1.
-- **Dependency resolver** — existing gap; skills install in the order given. Can be added later if the catalog grows.
-- **Update command** — not implemented today; out of scope for rename and OpenCode phases.
-- **Public marketplace / plugin store** — this is a personal repo, not a store.
-- **New skill content beyond existing ones** — the immediate goal is to own and repackage existing skills, not author new ones.
-- **Replacing `dotenvx`** — the credential model stays; migration to a native Go vault is a future concern.
-
 ## Context
 
 - Repurposed from a private employer-specific skill distribution tool.
 - The codebase is a Go CLI with embedded skill packages, a YAML frontmatter parser, an MCP config merger, and a thin `dotenvx` wrapper.
-- Only Claude Code is currently implemented; OpenCode packages and the dependency resolver are described in `DESIGN.md` but not implemented.
+- Only Claude Code is currently implemented; OpenCode packages and the dependency resolver are described in `ROADMAP.md` but not implemented.
 - The repo was previously located inside a home-directory git worktree; it has been moved to a standalone repo at `/Users/estvmachine/Projects/personal/stevmachine-skills`.
-- Existing code has hardcoded paths to `~/.claude`, `~/.medtasker-skills`, and `~/.claude.json`, plus scattered `medtasker` / `Claude Code` strings.
+- Existing code has hardcoded paths to `~/.claude`, `~/.stevmachine-skills`, and `~/.claude.json`, plus scattered `stevmachine` / `Claude Code` strings.
 
 ## Constraints
 
@@ -56,6 +47,12 @@ Steve can own, ship, and update his personal AI assistant skills from one repo w
 - **Ownership**: No employer branding, names, or proprietary references can remain before the repo is pushed to GitHub.
 - **Tooling**: Build and smoke test must pass before any phase is considered complete.
 - **Git**: The standalone repo must be initialized and pushed under the new name.
+- **Platforms**: Only Claude Code (v1) and OpenCode (v2) are targeted. Other agent platforms are not planned.
+- **Dependency resolver**: Skills install in the order given today. Topological ordering is planned for Phase 3.
+- **Update command**: Not implemented today; planned for Phase 3.
+- **Marketplace**: This is a personal repo, not a public store.
+- **New skill content**: The immediate goal is to own and repackage existing skills, not author new ones.
+- **Credential model**: `dotenvx` stays; a native Go vault is a future concern only if the Node dependency becomes unacceptable.
 
 ## Key Decisions
 
@@ -72,17 +69,17 @@ Steve can own, ship, and update his personal AI assistant skills from one repo w
 This document evolves at phase transitions and milestone boundaries.
 
 **After each phase transition** (via `/gsd-transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
+1. Requirements invalidated? → Remove or defer with reason.
+2. Requirements validated? → Move to Validated with phase reference.
+3. New requirements emerged? → Add to Active.
+4. Decisions to log? → Add to Key Decisions.
+5. "What This Is" still accurate? → Update if drifted.
 
 **After each milestone** (via `/gsd-complete-milestone`):
-1. Full review of all sections
+1. Full review of all sections.
 2. Core Value check — still the right priority?
-3. Audit Out of Scope — reasons still valid?
-4. Update Context with current state
+3. Audit deferred items — reasons still valid?
+4. Update Context with current state.
 
 ---
 *Last updated: 2026-07-15 after project initialization*

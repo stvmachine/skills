@@ -28,24 +28,9 @@
 - **TOOL-02**: Add an `update` command to refresh installed skills from the latest repo state.
 - **TOOL-03**: Add CI/CD pipeline (GitHub Actions) for build, test, and release.
 
-### Platforms
-
-- **PLAT-01**: Add skill.fish support as described in `DESIGN.md`.
-
 ### Skills
 
 - **SKILL-01**: Author new personal skills beyond the existing repurposed set.
-
-## Out of Scope
-
-| Feature | Reason |
-|---------|--------|
-| skill.fish / other platforms | Only Claude Code and OpenCode needed for v1 |
-| Dependency resolver | Existing gap; not required for rename or OpenCode install |
-| Update command | Not implemented today; out of scope for v1 |
-| Public marketplace / plugin store | Personal repo, not a store |
-| New skill content beyond existing | Repurpose first, then author new skills |
-| Replacing `dotenvx` | Current credential model works; native Go vault is future work |
 
 ## Traceability
 
@@ -68,4 +53,4 @@
 
 ---
 *Requirements defined: 2026-07-15*
-*Last updated: 2026-07-15 after initial definition*
+*Last updated: 2026-07-15*

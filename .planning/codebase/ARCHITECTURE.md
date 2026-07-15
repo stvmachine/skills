@@ -6,7 +6,7 @@
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
-│                     CLI Entry Point (cmd/medtasker-skills)           │
+│                     CLI Entry Point (cmd/stevmachine-skills)         │
 │  install │ list │ doctor │ env set/list/encrypt/decrypt/rotate/setup │
 └────────────────────────────────┬──────────────────────────────────────┘
                                  │
@@ -23,23 +23,23 @@
 ┌─────────────────────┐                    ┌─────────────────────┐
 │   internal/mcp      │                    │   internal/vault    │
 │  Parse SKILL.md     │                    │  dotenvx CLI wrapper│
-│  frontmatter, build │                    │  ~/.medtasker-skills│
+│  frontmatter, build │                    │  ~/.stevmachine-skills│
 │  ~/.claude/.mcp.json│                    │  .env / .env.keys   │
 └─────────────────────┘                    └─────────────────────┘
 ```
 
-`medtasker-skills` is a single Go binary that distributes Claude Code skills. Skills are embedded with `//go:embed` so the binary is self-contained. Install copies them to `~/.claude/skills/`, parses each skill's `SKILL.md` YAML frontmatter for `mcp_servers`, and merges those servers into `~/.claude/.mcp.json` (and `~/.claude.json`) while keeping `${VAR}` references literal. Credential management is delegated to the `dotenvx` Node.js CLI; the `internal/vault` package is a thin wrapper around it.
+`stevmachine-skills` is a single Go binary that distributes Claude Code skills. Skills are embedded with `//go:embed` so the binary is self-contained. Install copies them to `~/.claude/skills/`, parses each skill's `SKILL.md` YAML frontmatter for `mcp_servers`, and merges those servers into `~/.claude/.mcp.json` (and `~/.claude.json`) while keeping `${VAR}` references literal. Credential management is delegated to the `dotenvx` Node.js CLI; the `internal/vault` package is a thin wrapper around it.
 
 ## Component Responsibilities
 
 | Component | Responsibility | File |
 |-----------|----------------|------|
-| CLI main | Parse subcommands, dispatch to handlers | `cmd/medtasker-skills/main.go` |
-| Install command | Copy embedded skills, drive TUI, merge MCP configs | `cmd/medtasker-skills/cmd_install.go` |
-| Env command | Set/list/encrypt/decrypt/rotate vault vars, run setup wizard | `cmd/medtasker-skills/cmd_env.go` |
-| List command | Show available vs installed skills | `cmd/medtasker-skills/cmd_list.go` |
-| Doctor command | Check Claude Code dir, dotenvx, vault, optional deps | `cmd/medtasker-skills/cmd_doctor.go` |
-| UI styles | Lipgloss styles and status-line helpers | `cmd/medtasker-skills/ui.go` |
+| CLI main | Parse subcommands, dispatch to handlers | `cmd/stevmachine-skills/main.go` |
+| Install command | Copy embedded skills, drive TUI, merge MCP configs | `cmd/stevmachine-skills/cmd_install.go` |
+| Env command | Set/list/encrypt/decrypt/rotate vault vars, run setup wizard | `cmd/stevmachine-skills/cmd_env.go` |
+| List command | Show available vs installed skills | `cmd/stevmachine-skills/cmd_list.go` |
+| Doctor command | Check Claude Code dir, dotenvx, vault, optional deps | `cmd/stevmachine-skills/cmd_doctor.go` |
+| UI styles | Lipgloss styles and status-line helpers | `cmd/stevmachine-skills/ui.go` |
 | MCP manager | Parse SKILL.md frontmatter, build and write `.mcp.json` | `internal/mcp/mcp.go` |
 | Vault manager | Wrap `dotenvx` CLI for encrypted env files | `internal/vault/vault.go` |
 | Packages | Embed skill assets into the binary | `packages/embed.go` |
@@ -59,7 +59,7 @@
 
 **CLI Layer:**
 - Purpose: Dispatch commands and render output.
-- Location: `cmd/medtasker-skills/`
+- Location: `cmd/stevmachine-skills/`
 - Contains: Subcommand handlers, Bubble Tea TUI for install, `huh` form for env setup.
 - Depends on: `internal/mcp`, `internal/vault`, `packages`.
 - Used by: End user.
@@ -88,7 +88,7 @@
 
 ### Primary Install Path
 
-1. `main.go` dispatches `install` to `cmdInstall()` (`cmd/medtasker-skills/cmd_install.go:134`).
+1. `main.go` dispatches `install` to `cmdInstall()` (`cmd/stevmachine-skills/cmd_install.go:134`).
 2. Compute target dirs: `~/.claude/skills/` and MCP config paths `~/.claude/.mcp.json` plus `~/.claude.json` (`cmd_install.go:136-140`).
 3. If no args are provided, use `defaultSkills()` (`cmd_install.go:204-206`).
 4. For each skill, `doInstallOne()` reads the embedded directory from `packages.SkillsFS` (`cmd_install.go:208-230`).
@@ -100,14 +100,14 @@
 
 ### Env Command Path
 
-1. `main.go` dispatches `env <sub>` to `cmdEnvSet/List/Encrypt/Decrypt/Rotate/Setup` (`cmd/medtasker-skills/main.go:40-55`).
-2. `vault.New()` creates a manager whose `EnvDir` is `~/.medtasker-skills` (`internal/vault/vault.go:16-21`).
+1. `main.go` dispatches `env <sub>` to `cmdEnvSet/List/Encrypt/Decrypt/Rotate/Setup` (`cmd/stevmachine-skills/main.go:40-55`).
+2. `vault.New()` creates a manager whose `EnvDir` is `~/.stevmachine-skills` (`internal/vault/vault.go:16-21`).
 3. Each operation calls `runDotenvx()` which finds the `dotenvx` binary and runs it with `cmd.Dir = EnvDir` (`internal/vault/vault.go:71-79`).
-4. `cmdEnvSetup()` builds a `huh` form with hardcoded integrations and stores values via `vault.Manager.Set()` (`cmd/medtasker-skills/cmd_env.go:123-226`).
+4. `cmdEnvSetup()` builds a `huh` form with hardcoded integrations and stores values via `vault.Manager.Set()` (`cmd/stevmachine-skills/cmd_env.go:123-226`).
 
 ### List Command Path
 
-1. `cmdList()` reads installed directories from `~/.claude/skills/` (`cmd/medtasker-skills/cmd_list.go:14-25`).
+1. `cmdList()` reads installed directories from `~/.claude/skills/` (`cmd/stevmachine-skills/cmd_list.go:14-25`).
 2. It iterates embedded `claude-plugin/skills/` and parses each `SKILL.md` for descriptions (`cmd_list.go:34-45`).
 3. Prints a table with install status indicators.
 
@@ -126,21 +126,21 @@
 ## Entry Points
 
 **Binary:**
-- Location: `cmd/medtasker-skills/main.go`
-- Triggers: Direct invocation, `scripts/install.sh`, `go run ./cmd/medtasker-skills`.
+- Location: `cmd/stevmachine-skills/main.go`
+- Triggers: Direct invocation, `scripts/install.sh`, `go run ./cmd/stevmachine-skills`.
 - Responsibilities: Parse `os.Args`, dispatch subcommands, print usage.
 
 **Install Script:**
 - Location: `scripts/install.sh`
 - Triggers: Run from a fresh clone.
-- Responsibilities: Install `dotenvx`, build the binary, run `medtasker-skills install`, print next steps.
+- Responsibilities: Install `dotenvx`, build the binary, run `stevmachine-skills install`, print next steps.
 
 ## Architectural Constraints
 
-- **Single-platform support:** Only Claude Code is implemented. The repo embeds `packages/claude-plugin/skills`; `packages/opencode-package/` and `packages/skillfish-package/` from `DESIGN.md` do not exist.
-- **Hardcoded target directories:** `~/.claude`, `~/.medtasker-skills`, and `~/.claude.json` are literals in source.
+- **Single-platform support:** Only Claude Code is implemented. The repo embeds `packages/claude-plugin/skills`; `packages/opencode-package/` from early design drafts does not exist.
+- **Hardcoded target directories:** `~/.claude`, `~/.stevmachine-skills`, and `~/.claude.json` are literals in source.
 - **External CLI dependency:** `internal/vault` shells out to `dotenvx` and fails if it is missing or not on PATH.
-- **No dependency graph:** The DESIGN.md describes a dependency resolver, but the current CLI installs skills in the order given without resolving `dependencies:` from frontmatter.
+- **No dependency graph:** `ROADMAP.md` plans a dependency resolver for Phase 3, but the current CLI installs skills in the order given without resolving `dependencies:` from frontmatter.
 - **No config validation:** `.mcp.json` write path uses `map[string]any` and JSON marshal/unmarshal; malformed existing configs are silently overwritten.
 - **TUI fallback relies on error:** `tea.NewProgram(...).Run()` error is used to detect non-TTY, which means piped output may contain ANSI escape sequences before the fallback runs.
 
@@ -148,7 +148,7 @@
 
 ### Hardcoded User Directories in Multiple Files
 
-**What happens:** `~/.claude`, `~/.claude/skills`, `~/.medtasker-skills`, and `~/.claude.json` are constructed inline in `cmd_install.go`, `cmd_list.go`, `cmd_doctor.go`, and `cmd_env.go`.
+**What happens:** `~/.claude`, `~/.claude/skills`, `~/.stevmachine-skills`, and `~/.claude.json` are constructed inline in `cmd_install.go`, `cmd_list.go`, `cmd_doctor.go`, and `cmd_env.go`.
 **Why it's wrong:** Renaming the product, supporting a second platform (OpenCode), or allowing custom install roots requires editing many files and risks inconsistency.
 **Do this instead:** Centralize all path constants in a `pkg/paths` or `internal/platform` package and inject a platform abstraction into the commands.
 
@@ -161,7 +161,7 @@
 ### Missing Directory Creation in Vault Set
 
 **What happens:** `vault.Manager.Set` runs `dotenvx` with `cmd.Dir = EnvDir` but never creates the directory (`internal/vault/vault.go:105-112`).
-**Why it's wrong:** On a fresh machine `medtasker-skills env set` fails with `chdir … no such file or directory`.
+**Why it's wrong:** On a fresh machine `stevmachine-skills env set` fails with `chdir … no such file or directory`.
 **Do this instead:** Ensure `EnvDir` exists in `Set`, `Get`, and `ListVars`, or call `InitVault` lazily.
 
 ## Error Handling
