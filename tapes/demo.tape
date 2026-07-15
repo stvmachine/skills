@@ -12,21 +12,21 @@ Set Theme "Dracula"
 
 Sleep 500ms
 
-Type "medtasker-skills list"
+Type "stevmachine-skills list"
 Sleep 400ms
 Enter
 Sleep 3s
 
 Sleep 800ms
 
-Type "medtasker-skills doctor"
+Type "stevmachine-skills doctor"
 Sleep 400ms
 Enter
 Sleep 1500ms
 
 Sleep 800ms
 
-Type "medtasker-skills env list"
+Type "stevmachine-skills env list"
 Sleep 400ms
 Enter
 Sleep 1500ms
@@ -37,5 +37,5 @@ Type "# launch Claude with decrypted credentials injected"
 Sleep 500ms
 Enter
 Sleep 200ms
-Type "dotenvx run -f ~/.medtasker-skills/.env -- claude"
+Type "dotenvx run -f ~/.stevmachine-skills/.env -- claude"
 Sleep 3s

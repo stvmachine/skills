@@ -39,11 +39,11 @@ freeze "$TAPES/setup-flow.sh" \
 
 echo "→ vhs: demo.gif"
 # Build into a temp dir and put it on PATH for the recording session.
-# Don't overwrite the user's /opt/homebrew/bin/medtasker-skills.
+# Don't overwrite the user's /opt/homebrew/bin/stevmachine-skills.
 # VHS Output paths must be relative, so we cd into tapes/ and move the result.
 TMPBIN="$(mktemp -d)"
 trap 'rm -rf "$TMPBIN"' EXIT
-go build -o "$TMPBIN/medtasker-skills" "$REPO/cmd/medtasker-skills"
+go build -o "$TMPBIN/stevmachine-skills" "$REPO/cmd/stevmachine-skills"
 cd "$TAPES"
 PATH="$TMPBIN:$PATH" vhs demo.tape
 mv demo.gif "$ASSETS/demo.gif"
