@@ -23,6 +23,7 @@
 - [ ] `01-05-PLAN.md` — GitHub publish
 
 **Success criteria:**
+
 - `go build -o stevmachine-skills ./cmd/stevmachine-skills` succeeds.
 - `./stevmachine-skills install` copies `stevmachine-*` skills to `~/.claude/skills/`.
 - `~/.claude/.mcp.json` is written with `stevmachine-*` server entries.
@@ -58,6 +59,7 @@
    - Ensure Claude Code install still works after the refactor.
 
 **Success criteria:**
+
 - `stevmachine-skills install --platform opencode` installs skills into OpenCode directory.
 - Claude Code install still works.
 - `dotenvx` credentials are shared and resolve correctly for both platforms.
@@ -86,6 +88,7 @@
    - Release binary artifacts.
 
 **Success criteria:**
+
 - Installing a skill with dependencies auto-installs those dependencies.
 - `update` refreshes installed skills without manual reinstall.
 - Releases are built automatically on tags.
