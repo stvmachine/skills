@@ -6,7 +6,7 @@
 
 ## Context
 
-The medtasker-skills project is building a skill distribution system for AI agent platforms (Claude Code, OpenCode, skill.fish). The system manages MCP server credentials for services including Jira, GitHub, Figma, and Confluence.
+The stevmachine-skills project is building a skill distribution system for AI agent platforms (Claude Code, OpenCode, skill.fish). The system manages MCP server credentials for services including Jira, GitHub, Figma, and Confluence.
 
 The access pattern is what drives the design: Claude Code reads `~/.claude/.mcp.json` and expands `${VAR}` references from its own process environment when it spawns an MCP server. So whatever stores the secrets at rest must be able to inject them into the env of the `claude` process at launch time, without ever writing plaintext to disk.
 
@@ -22,11 +22,11 @@ We need a credential management solution that is:
 
 ## Decision
 
-**Adopt [dotenvx](https://github.com/dotenvx/dotenvx) as the sole credential storage mechanism** for the medtasker-skills distribution system. **OS-native credential stores are explicitly not used**, neither as primary storage nor as a fallback.
+**Adopt [dotenvx](https://github.com/dotenvx/dotenvx) as the sole credential storage mechanism** for the stevmachine-skills distribution system. **OS-native credential stores are explicitly not used**, neither as primary storage nor as a fallback.
 
 ### Implementation Strategy
 
-1. **Encrypted vault only.** Secrets live in `~/.medtasker-skills/.env` (ciphertext when encrypted) with the decryption key in `~/.medtasker-skills/.env.keys` (plaintext, machine-local, never committed). No plaintext `.env` fallback, no Keychain/Secret Service/Credential Manager integration.
+1. **Encrypted vault only.** Secrets live in `~/.stevmachine-skills/.env` (ciphertext when encrypted) with the decryption key in `~/.stevmachine-skills/.env.keys` (plaintext, machine-local, never committed). No plaintext `.env` fallback, no Keychain/Secret Service/Credential Manager integration.
 2. **ECIES encryption** (secp256k1 curve + AES-256-GCM) for all stored credentials.
 3. **Cryptographic separation.** The vault and the decryption key are stored as separate files so an attacker must compromise both to recover plaintext.
 4. **Environment branching** via `.env` / `.env.production` / etc.
@@ -36,10 +36,10 @@ We need a credential management solution that is:
 
 ```bash
 # One-time setup
-medtasker-skills env set JIRA_API_TOKEN <token>   # writes through to vault
+stevmachine-skills env set JIRA_API_TOKEN <token>   # writes through to vault
 
 # Launch Claude Code with vault decrypted in-process
-dotenvx run -f ~/.medtasker-skills/.env -- claude
+dotenvx run -f ~/.stevmachine-skills/.env -- claude
 
 # Share encrypted .env across devices (key managed separately)
 git add .env           # safe — ciphertext
@@ -62,7 +62,7 @@ Layering native stores in front of the vault also created a coherence problem: i
 
 1. **Dramatically Reduced Breach Risk**: ECIES encryption provides 200× lower breach risk versus centralized storage (99.5% reduction). Even if the vault file is exposed, secrets remain encrypted.
 
-2. **AI-Safe Credentials**: Encrypted files protect against AI coding tools (Claude Code, GitHub Copilot, etc.) reading secrets when processing files in context. This is critical as medtasker-skills integrates deeply with AI agent platforms.
+2. **AI-Safe Credentials**: Encrypted files protect against AI coding tools (Claude Code, GitHub Copilot, etc.) reading secrets when processing files in context. This is critical as stevmachine-skills integrates deeply with AI agent platforms.
 
 3. **Zero Infrastructure**: Unlike cloud-based secret managers, dotenvx requires no servers, no SaaS subscriptions, and no network access. Secrets are stored in git alongside code.
 
@@ -74,7 +74,7 @@ Layering native stores in front of the vault also created a coherence problem: i
 
 7. **Environment Branching**: Native support for `.env.development`, `.env.production`, etc., aligned with modern deployment practices.
 
-8. **Future-Proof for Agentic Storage**: dotenvx is developing Agentic Secret Storage (AS2) for autonomous software — aligned with medtasker-skills' AI-native architecture.
+8. **Future-Proof for Agentic Storage**: dotenvx is developing Agentic Secret Storage (AS2) for autonomous software — aligned with stevmachine-skills' AI-native architecture.
 
 9. **Industry Validation**: Adopted by major organizations including NASA (Earthdata Search), Supabase, AWS Amplify Gen 2, Cloudflare, and PayPal.
 
@@ -125,7 +125,7 @@ Layering native stores in front of the vault also created a coherence problem: i
 | **Operational Burden** | Significant (HA, backups, upgrades) | None |
 | **Features** | RBAC, dynamic secrets, audit logs | Encryption + environment branching |
 
-**Decision**: Rejected as massive overkill. Vault's enterprise features (RBAC, dynamic secrets, PKI) are unnecessary for medtasker-skills' scope. The operational burden contradicts the project's low-friction goals.
+**Decision**: Rejected as massive overkill. Vault's enterprise features (RBAC, dynamic secrets, PKI) are unnecessary for stevmachine-skills' scope. The operational burden contradicts the project's low-friction goals.
 
 ### 4. Continue with Plaintext `.env`
 
@@ -172,7 +172,7 @@ Layering native stores in front of the vault also created a coherence problem: i
 ## Notes
 
 - This ADR should be reviewed after 3 months of production use to validate key management workflows and user adoption
-- Consider contributing to dotenvx's Agentic Secret Storage (AS2) initiative as it aligns with medtasker-skills' autonomous AI architecture
+- Consider contributing to dotenvx's Agentic Secret Storage (AS2) initiative as it aligns with stevmachine-skills' autonomous AI architecture
 - Monitor for native Python bindings or alternatives if Node.js dependency becomes problematic for pure-Python environments
 
 ## Follow-up Implementation Work
@@ -181,5 +181,5 @@ This ADR change implies code changes that have not yet landed:
 
 - Remove the `CredentialManager` Keychain / Secret Service / Windows Credential Manager branches in `src/installer/credentials.py`; route all reads/writes through `DotenvxVaultManager`.
 - Drop the `keyring` and `pywin32` optional dependencies.
-- Update installer/CLI surfaces so `medtasker-skills env set/get/list` are vault-only.
-- Document the launcher (shell function or wrapper script) that runs `dotenvx run -f ~/.medtasker-skills/.env -- claude` so users don't have to type it.
+- Update installer/CLI surfaces so `stevmachine-skills env set/get/list` are vault-only.
+- Document the launcher (shell function or wrapper script) that runs `dotenvx run -f ~/.stevmachine-skills/.env -- claude` so users don't have to type it.

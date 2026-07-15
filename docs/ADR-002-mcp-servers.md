@@ -10,10 +10,10 @@ Two categories: **skill-bound** servers (declared in a specific skill's `mcp_ser
 
 | Server | How it runs | Auth | Used by |
 |--------|-------------|------|---------|
-| `mcp-atlassian` | `uvx mcp-atlassian --transport stdio` | env vars (`JIRA_*`, `CONFLUENCE_*`) | `medtasker-jira`, `medtasker-jira-ticket-transition` |
-| `github` | `npx -y @modelcontextprotocol/server-github` | `GITHUB_TOKEN` env var | `medtasker-jira`, `medtasker-jira-ticket-transition` |
+| `mcp-atlassian` | `uvx mcp-atlassian --transport stdio` | env vars (`JIRA_*`, `CONFLUENCE_*`) | `stevmachine-jira`, `stevmachine-jira-ticket-transition` |
+| `github` | `npx -y @modelcontextprotocol/server-github` | `GITHUB_TOKEN` env var | `stevmachine-jira`, `stevmachine-jira-ticket-transition` |
 | `figma` | `npx -y @tmegit/figma-developer-mcp --stdio --json` | `FIGMA_API_KEY` env var | (opt-in; not in any default skill) |
-| `context7` | HTTP to `https://mcp.context7.com/mcp` | `CONTEXT7_API_KEY` header | `medtasker-jira`, `medtasker-jira-ticket-transition` |
+| `context7` | HTTP to `https://mcp.context7.com/mcp` | `CONTEXT7_API_KEY` header | `stevmachine-jira`, `stevmachine-jira-ticket-transition` |
 
 ### Baseline
 

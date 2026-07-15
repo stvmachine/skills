@@ -1,12 +1,12 @@
-# Medtasker Skills Distribution Repository — Design Document
+# Stevmachine Skills Distribution Repository — Design Document
 
 ## 1. Overview
 
-This document specifies the architecture for a **skill distribution repository** that packages Medtasker skills for distribution across multiple AI agent platforms (Claude Code, OpenCode, and others). It covers repository structure, installation mechanisms, MCP encapsulation, subagent orchestration, dependency resolution, multi-platform support, and security.
+This document specifies the architecture for a **skill distribution repository** that packages Stevmachine skills for distribution across multiple AI agent platforms (Claude Code, OpenCode, and others). It covers repository structure, installation mechanisms, MCP encapsulation, subagent orchestration, dependency resolution, multi-platform support, and security.
 
 ### Goals
 
-- Provide a **single source of truth** for Medtasker skills
+- Provide a **single source of truth** for Stevmachine skills
 - Enable **one-command installation** of skills and their dependencies
 - **Auto-install** infrastructure tools (`beads`, `rtk`) when missing
 - **Hide MCP complexity** from end users via skill-embedded configuration
@@ -18,7 +18,7 @@ This document specifies the architecture for a **skill distribution repository**
 ## 2. Repository Structure
 
 ```
-medtasker-skills/
+stevmachine-skills/
 ├── README.md                          # Project overview and quick start
 ├── DESIGN.md                          # This document
 ├── LICENSE
@@ -29,11 +29,11 @@ medtasker-skills/
 │   │   │   ├── plugin.json            # Plugin manifest
 │   │   │   └── marketplace.json       # Marketplace catalog
 │   │   ├── skills/                    # Skills for Claude Code
-│   │   │   ├── medtasker-jira/
+│   │   │   ├── stevmachine-jira/
 │   │   │   │   └── SKILL.md
-│   │   │   ├── medtasker-jira-markup/
+│   │   │   ├── stevmachine-jira-markup/
 │   │   │   │   └── SKILL.md
-│   │   │   ├── medtasker-jira-ticket-transition/
+│   │   │   ├── stevmachine-jira-ticket-transition/
 │   │   │   │   └── SKILL.md
 │   │   ├── commands/                  # Flat command skills (optional)
 │   │   ├── agents/                    # Subagent definitions
@@ -42,27 +42,27 @@ medtasker-skills/
 │   │
 │   ├── opencode-package/              # OpenCode-compatible package
 │   │   ├── skills/                    # Skills with YAML frontmatter
-│   │   │   ├── medtasker-jira/
+│   │   │   ├── stevmachine-jira/
 │   │   │   │   ├── SKILL.md           # With embedded MCP config
 │   │   │   │   └── rules/
 │   │   │   │       ├── fetch.md
 │   │   │   │       ├── update.md
 │   │   │   │       ├── mcp-utils.md
 │   │   │   │       └── ...
-│   │   │   ├── medtasker-jira-markup/
+│   │   │   ├── stevmachine-jira-markup/
 │   │   │   │   └── SKILL.md
-│   │   │   ├── medtasker-jira-ticket-transition/
+│   │   │   ├── stevmachine-jira-ticket-transition/
 │   │   │   │   └── SKILL.md
 │   │   └── manifest.json              # OpenCode manifest
 │   │
 │   └── skillfish-package/             # skill.fish compatible package
 │       ├── skillfish.json             # Manifest for skillfish CLI
 │       └── skills/
-│           ├── medtasker-jira/
+│           ├── stevmachine-jira/
 │           │   └── SKILL.md
-│           ├── medtasker-jira-markup/
+│           ├── stevmachine-jira-markup/
 │           │   └── SKILL.md
-│           ├── medtasker-jira-ticket-transition/
+│           ├── stevmachine-jira-ticket-transition/
 │           │   └── SKILL.md
 │
 ├── src/                               # Source code for installer CLI
@@ -122,15 +122,15 @@ medtasker-skills/
 
 ### 3.1 Installer (clone + run)
 
-The repo is private; anonymous HTTPS to `github.com/nimblic/medtasker-skills` returns 404, so the historical `curl | bash` and `go install …@latest` flows do not work. The installer is invoked from a fresh clone:
+The repo is private; anonymous HTTPS to `github.com/stvmachine/skills` returns 404, so the historical `curl | bash` and `go install …@latest` flows do not work. The installer is invoked from a fresh clone:
 
 ```bash
 # macOS / Linux
-git clone git@github.com:nimblic/medtasker-skills.git
-cd medtasker-skills && ./scripts/install.sh
+git clone git@github.com:stvmachine/skills.git
+cd stevmachine-skills && ./scripts/install.sh
 ```
 
-Windows isn't supported by `install.sh`; build the CLI manually from a cloned repo (`go build -o <PATH-dir>/medtasker-skills ./cmd/medtasker-skills`).
+Windows isn't supported by `install.sh`; build the CLI manually from a cloned repo (`go build -o <PATH-dir>/stevmachine-skills ./cmd/stevmachine-skills`).
 
 ### 3.2 Installer Behavior
 
@@ -139,7 +139,7 @@ The installer performs the following steps:
 1. **Detect Platform**: Identify which agent platforms are installed:
    - Claude Code: Check for `~/.claude/` directory
    - OpenCode: Check for `~/.opencode/` or `opencode` command
-   - Other: Check for `~/.agents/skills/` (medtasker)
+   - Other: Check for `~/.agents/skills/` (stevmachine)
 
 2. **Auto-Install Infrastructure**:
    ```bash
@@ -157,7 +157,7 @@ The installer performs the following steps:
    ```
 
 3. **Install Skills**:
-   - Clone the repository to `~/.medtasker-skills/`
+   - Clone the repository to `~/.stevmachine-skills/`
    - Install platform-appropriate packages to detected directories
    - Resolve and install dependencies
 
@@ -166,28 +166,28 @@ The installer performs the following steps:
    - Prompt for missing credentials
    - Write secure MCP config files
 
-### 3.3 CLI Tool: `medtasker-skills`
+### 3.3 CLI Tool: `stevmachine-skills`
 
-After installation, users interact with the system via the `medtasker-skills` CLI:
+After installation, users interact with the system via the `stevmachine-skills` CLI:
 
 ```bash
-# Install all Medtasker skills
-medtasker-skills install
+# Install all Stevmachine skills
+stevmachine-skills install
 
 # Install specific skill
-medtasker-skills install medtasker-jira
+stevmachine-skills install stevmachine-jira
 
 # Update all skills
-medtasker-skills update
+stevmachine-skills update
 
 # List installed skills
-medtasker-skills list
+stevmachine-skills list
 
 # Check dependencies
-medtasker-skills deps --tree
+stevmachine-skills deps --tree
 
 # Verify installation
-medtasker-skills doctor
+stevmachine-skills doctor
 ```
 
 ### 3.4 Installation Flow Diagram
@@ -199,7 +199,7 @@ User runs install.sh
 ┌─────────────────┐
 │ Detect Platform │──► Claude Code? ──► Install to ~/.claude/plugins/
 │                 │──► OpenCode? ─────► Install to ~/.opencode/skills/
-│                 │──► medtasker? ────► Install to ~/.agents/skills/
+│                 │──► stevmachine? ────► Install to ~/.agents/skills/
 └─────────────────┘
     │
     ▼
@@ -241,7 +241,7 @@ Skills bundle MCP server configurations directly in their YAML frontmatter. This
 
 ```yaml
 ---
-name: medtasker-jira
+name: stevmachine-jira
 description: Connect code work to Jira tickets
 mcp_servers:
   - name: mcp-atlassian
@@ -266,7 +266,7 @@ The build pipeline transforms the canonical format into Claude Code's `plugin.js
 ```json
 // .claude-plugin/plugin.json
 {
-  "name": "medtasker-jira",
+  "name": "stevmachine-jira",
   "version": "1.0.0",
   "description": "Connect code work to Jira tickets",
   "mcpServers": "./.mcp.json"
@@ -368,7 +368,7 @@ mcp_servers:
 ```
 
 The installer resolves these at install time or runtime:
-- **Install time**: Prompt user for values, write to `~/.medtasker-skills/.env`
+- **Install time**: Prompt user for values, write to `~/.stevmachine-skills/.env`
 - **Runtime**: Load from environment or `.env` file before starting MCP server
 
 ---
@@ -377,14 +377,14 @@ The installer resolves these at install time or runtime:
 
 ### 5.1 Skill-Initiated Subagents
 
-Skills spawn subagents for external service interactions. The orchestrator skill (`medtasker-jira-ticket-transition`) demonstrates this pattern:
+Skills spawn subagents for external service interactions. The orchestrator skill (`stevmachine-jira-ticket-transition`) demonstrates this pattern:
 
 ```markdown
-# medtasker-jira-ticket-transition dependencies
+# stevmachine-jira-ticket-transition dependencies
 This skill orchestrates three other skills:
 - `/commit` — for creating properly formatted commits
-- `/medtasker-jira` — for Jira transitions and linking
-- `/medtasker-jira-markup` — for Jira comment formatting
+- `/stevmachine-jira` — for Jira transitions and linking
+- `/stevmachine-jira-markup` — for Jira comment formatting
 ```
 
 ### 5.2 Subagent Spawning Pattern
@@ -460,16 +460,16 @@ Skills declare dependencies in their YAML frontmatter:
 
 ```yaml
 ---
-name: medtasker-jira-ticket-transition
+name: stevmachine-jira-ticket-transition
 description: Advance a Jira ticket — ship to QA or send for peer review
 dependencies:
   - name: commit
     version: ">=1.0.0"
     required: true
-  - name: medtasker-jira
+  - name: stevmachine-jira
     version: ">=1.0.0"
     required: true
-  - name: medtasker-jira-markup
+  - name: stevmachine-jira-markup
     version: ">=1.0.0"
     required: true
 ---
@@ -511,19 +511,19 @@ class DependencyResolver:
 
 ### 6.3 Installation Order Example
 
-For `medtasker-jira-ticket-transition`:
+For `stevmachine-jira-ticket-transition`:
 
 ```
-medtasker-jira-ticket-transition
+stevmachine-jira-ticket-transition
 ├── commit (required)
-├── medtasker-jira (required)
-│   └── medtasker-jira-markup (required)
+├── stevmachine-jira (required)
+│   └── stevmachine-jira-markup (required)
 
 Installation order:
 1. commit
-2. medtasker-jira-markup
-3. medtasker-jira
-4. medtasker-jira-ticket-transition
+2. stevmachine-jira-markup
+3. stevmachine-jira
+4. stevmachine-jira-ticket-transition
 ```
 
 ### 6.4 Version Resolution
@@ -543,7 +543,7 @@ Installation order:
 |----------|-----------|---------------|-----------|
 | Claude Code | `~/.claude/skills/` or `~/.claude/plugins/` | `plugin.json` | Auto-scan on startup |
 | OpenCode | `~/.opencode/skills/` or `.opencode/skills/` | None (auto-discover) | Auto-scan on startup |
-| Medtasker | `~/.agents/skills/` | None | Auto-scan on startup |
+| Stevmachine | `~/.agents/skills/` | None | Auto-scan on startup |
 | skill.fish | `~/skillfish/skills/` or `./skills/` | `skillfish.json` | CLI command |
 
 ### 7.2 Platform-Specific Installation
@@ -592,7 +592,7 @@ The canonical skill format uses YAML frontmatter that all platforms can parse:
 
 ```yaml
 ---
-name: medtasker-jira
+name: stevmachine-jira
 description: Connect code work to Jira tickets
 platforms:
   - claude-code
@@ -604,7 +604,7 @@ mcp_servers:
     command: npx
     args: [-y, @modelcontextprotocol/server-atlassian]
 dependencies:
-  - name: medtasker-jira-markup
+  - name: stevmachine-jira-markup
     required: true
 ---
 ```
@@ -789,12 +789,12 @@ export HOME=$(mktemp -d)
 ./scripts/install.sh
 
 # Verify skills installed
-medtasker-skills list | grep medtasker-jira
-medtasker-skills list | grep medtasker-jira-ticket-transition
+stevmachine-skills list | grep stevmachine-jira
+stevmachine-skills list | grep stevmachine-jira-ticket-transition
 
 # Verify dependencies resolved
-medtasker-skills deps --tree | grep "commit"
-medtasker-skills deps --tree | grep "medtasker-jira-markup"
+stevmachine-skills deps --tree | grep "commit"
+stevmachine-skills deps --tree | grep "stevmachine-jira-markup"
 
 # Verify infrastructure installed
 which bd
@@ -828,7 +828,7 @@ rm -rf $HOME
 
 ### Phase 4: Infrastructure (Week 4)
 - [ ] Auto-install beads-mcp and rtk
-- [ ] Add `medtasker-skills` CLI
+- [ ] Add `stevmachine-skills` CLI
 - [ ] Implement update mechanism
 - [ ] Add verification (`doctor`) command
 
@@ -910,8 +910,8 @@ rm -rf $HOME
 
 | Directory | Permissions | Owner |
 |-----------|-------------|-------|
-| `~/.medtasker-skills/` | 700 (rwx------) | User |
-| `~/.medtasker-skills/.env` | 600 (rw-------) | User |
+| `~/.stevmachine-skills/` | 700 (rwx------) | User |
+| `~/.stevmachine-skills/.env` | 600 (rw-------) | User |
 | `~/.claude/skills/` | 755 (rwxr-xr-x) | User |
 | `~/.opencode/skills/` | 755 (rwxr-xr-x) | User |
 
@@ -924,7 +924,7 @@ rm -rf $HOME
 | `CONFLUENCE_URL` | Confluence base URL | For Confluence skills |
 | `GITHUB_TOKEN` | GitHub personal access token | For GitHub skills |
 | `FIGMA_API_TOKEN` | Figma API token | For Figma skills |
-| `MEDTASKER_SKILLS_DEBUG` | Enable debug logging | Optional |
+| `STEVMACHINE_SKILLS_DEBUG` | Enable debug logging | Optional |
 
 ---
 
@@ -935,11 +935,11 @@ rm -rf $HOME
 3. [skill.fish NPM Package](https://www.npmjs.com/package/skillfish)
 4. [DockYard/skill CLI](https://github.com/DockYard/skill)
 5. [Model Context Protocol Specification](https://modelcontextprotocol.io/)
-6. [Medtasker Jira Skill](~/.agents/skills/medtasker-jira/SKILL.md)
-7. [Medtasker Move Skill](~/.agents/skills/medtasker-jira-ticket-transition/SKILL.md)
+6. [Stevmachine Jira Skill](~/.agents/skills/stevmachine-jira/SKILL.md)
+7. [Stevmachine Move Skill](~/.agents/skills/stevmachine-jira-ticket-transition/SKILL.md)
 
 ---
 
 *Document Version: 1.0.0*
 *Last Updated: 2026-05-21*
-*Authors: Medtasker Engineering Team*
+**

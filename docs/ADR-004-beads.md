@@ -6,13 +6,13 @@ Beads (`gastownhall/beads-mcp`, CLI `bd`) is a local SQLite-backed issue tracker
 
 ## What we use it for
 
-When a user runs `/medtasker-jira inbox MT-1234`, that ticket — description, acceptance criteria, related links, recent comments — has to be stored locally so downstream skills (`/medtasker-jira-ticket-transition qa`, future planners) can read it without going back to Jira every time. We need a place to put it.
+When a user runs `/stevmachine-jira inbox MT-1234`, that ticket — description, acceptance criteria, related links, recent comments — has to be stored locally so downstream skills (`/stevmachine-jira-ticket-transition qa`, future planners) can read it without going back to Jira every time. We need a place to put it.
 
 ## What we tried first
 
 Originally we tried beads-as-required: all skills wrote to `bd`, queried from `bd`, and assumed `bd` was on `PATH`. We discovered three problems:
 
-1. **Install friction.** `bd` is a separate dependency on a separate release cycle, with its own update lifecycle. A user installing medtasker-skills had to install another tool just to fetch their first Jira ticket. The skills failed cryptically (`chdir … no such file or directory`) when `bd` was missing.
+1. **Install friction.** `bd` is a separate dependency on a separate release cycle, with its own update lifecycle. A user installing stevmachine-skills had to install another tool just to fetch their first Jira ticket. The skills failed cryptically (`chdir … no such file or directory`) when `bd` was missing.
 
 2. **Opacity.** Bead notes live in SQLite. There's no `cat ./.todo/MT-1234/TICKET_DESCRIPTION.md` to glance at a ticket. Every inspection goes through `bd show <id>`, which is fine when you're driving via Claude but annoying when you just want to see what you've got.
 
@@ -24,20 +24,20 @@ Originally we tried beads-as-required: all skills wrote to `bd`, queried from `b
 
 | Condition | Backend | Storage |
 |---|---|---|
-| `command -v bd` succeeds AND `MEDTASKER_FORCE_FILESYSTEM` unset | Beads | `~/.beads/` |
-| Otherwise | Filesystem | `${MEDTASKER_TICKET_DIR:-./.todo}/<TICKET-ID>/TICKET_DESCRIPTION.md` |
+| `command -v bd` succeeds AND `STEVMACHINE_FORCE_FILESYSTEM` unset | Beads | `~/.beads/` |
+| Otherwise | Filesystem | `${STEVMACHINE_TICKET_DIR:-./.todo}/<TICKET-ID>/TICKET_DESCRIPTION.md` |
 
-Both backends carry the same schema (status values, priority mapping, notes template). The full contract is in `packages/claude-plugin/skills/medtasker-jira/rules/ticket-storage.md`. Downstream skills (`medtasker-jira-ticket-transition`) check both, prefer beads when present.
+Both backends carry the same schema (status values, priority mapping, notes template). The full contract is in `packages/claude-plugin/skills/stevmachine-jira/rules/ticket-storage.md`. Downstream skills (`stevmachine-jira-ticket-transition`) check both, prefer beads when present.
 
 ## Why this shape
 
-- **Default = filesystem.** A user who just ran `medtasker-skills install` and `/medtasker-jira inbox` should get a working ticket without installing anything else. They will, because `./.todo/MT-1234/TICKET_DESCRIPTION.md` requires nothing beyond `mkdir`.
+- **Default = filesystem.** A user who just ran `stevmachine-skills install` and `/stevmachine-jira inbox` should get a working ticket without installing anything else. They will, because `./.todo/MT-1234/TICKET_DESCRIPTION.md` requires nothing beyond `mkdir`.
 
 - **`bd` is an optimization, not a prereq.** When beads is present, the skill uses it transparently — same skill code, different backend. The user gets the structured-query benefits (`bd query "label=jira" --status open` is genuinely useful) without those benefits being a prerequisite for anyone else.
 
-- **`MEDTASKER_FORCE_FILESYSTEM=1` is the escape hatch.** For CI runners, ephemeral shells, or when you want to keep `bd` clean while testing something locally, you can force filesystem mode without uninstalling `bd`.
+- **`STEVMACHINE_FORCE_FILESYSTEM=1` is the escape hatch.** For CI runners, ephemeral shells, or when you want to keep `bd` clean while testing something locally, you can force filesystem mode without uninstalling `bd`.
 
-- **`MEDTASKER_TICKET_DIR` is configurable, defaults sensibly.** `./.todo/` puts ticket context next to the code it relates to — branch and repo together, easy to `.gitignore`. Setting `MEDTASKER_TICKET_DIR=~/.medtasker-tickets` makes context global if you'd rather have it follow you across repos.
+- **`STEVMACHINE_TICKET_DIR` is configurable, defaults sensibly.** `./.todo/` puts ticket context next to the code it relates to — branch and repo together, easy to `.gitignore`. Setting `STEVMACHINE_TICKET_DIR=~/.stevmachine-tickets` makes context global if you'd rather have it follow you across repos.
 
 ## What we lose vs. beads-required
 
@@ -54,9 +54,9 @@ beads (bd) not installed — Jira tickets will use filesystem (./.todo/) instead
   → Install: curl -fsSL https://raw.githubusercontent.com/gastownhall/beads/main/integrations/beads-mcp/install.sh | bash
 ```
 
-The framing is deliberate: missing `bd` is not an error, it's a different mode. Users who try beads and don't like it can remove `bd` from their PATH (or set `MEDTASKER_FORCE_FILESYSTEM=1`) and lose nothing.
+The framing is deliberate: missing `bd` is not an error, it's a different mode. Users who try beads and don't like it can remove `bd` from their PATH (or set `STEVMACHINE_FORCE_FILESYSTEM=1`) and lose nothing.
 
 ## Related
 
 - ADR-003 (RTK): same posture — suggest, don't bundle, host-level tool managed by the user.
-- `packages/claude-plugin/skills/medtasker-jira/rules/ticket-storage.md`: the full schema for both backends.
+- `packages/claude-plugin/skills/stevmachine-jira/rules/ticket-storage.md`: the full schema for both backends.
