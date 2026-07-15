@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Post-install sanity check for Medtasker Skills.
+# Post-install sanity check for Stevmachine Skills.
 # Usage: ./verify-install.sh
 
 set -euo pipefail
@@ -19,13 +19,13 @@ check_cmd() {
     else fail "$1 not on PATH"; fi
 }
 
-echo "Medtasker Skills install verification"
+echo "Stevmachine Skills install verification"
 
 check_cmd go || true
 check_cmd dotenvx
-check_cmd medtasker-skills
+check_cmd stevmachine-skills
 
-VAULT_DIR="$HOME/.medtasker-skills"
+VAULT_DIR="$HOME/.stevmachine-skills"
 if [ -d "$VAULT_DIR" ]; then
     pass "Vault directory exists: $VAULT_DIR"
     PERMS=$(stat -c "%a" "$VAULT_DIR" 2>/dev/null || stat -f "%Lp" "$VAULT_DIR" 2>/dev/null || echo "?")
@@ -36,16 +36,16 @@ else
 fi
 
 if [ -f "$VAULT_DIR/.env.vault" ]; then pass "Encrypted vault present"
-else warn "No .env.vault yet — run: medtasker-skills env setup"; fi
+else warn "No .env.vault yet — run: stevmachine-skills env setup"; fi
 
 if [ -d "$HOME/.claude" ]; then pass "Claude Code directory present"
 else fail "Claude Code not detected (~/.claude missing)"; fi
 
 if [ -f "$HOME/.claude/.mcp.json" ]; then pass "MCP config present"
-else warn "No .mcp.json — run: medtasker-skills install"; fi
+else warn "No .mcp.json — run: stevmachine-skills install"; fi
 
-if command -v medtasker-skills >/dev/null 2>&1; then
-    medtasker-skills doctor || warn "medtasker-skills doctor reported issues"
+if command -v stevmachine-skills >/dev/null 2>&1; then
+    stevmachine-skills doctor || warn "stevmachine-skills doctor reported issues"
 fi
 
 echo ""
