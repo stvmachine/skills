@@ -86,7 +86,7 @@ type_text() { send -l "$1"; }     # literal text (no key-name translation)
 hit_enter() { send Enter; }
 
 # Drive ---------------------------------------------------------------------
-expect "Medtasker Skills Setup" || exit 1
+expect "Stevmachine Skills Setup" || exit 1
 hit_enter                                       # dismiss the intro Note
 
 case "$PROFILE" in
