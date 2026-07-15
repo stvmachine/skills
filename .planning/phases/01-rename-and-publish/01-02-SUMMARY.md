@@ -101,6 +101,7 @@ Each task was committed atomically:
 1. **Task 1: Rename skill directories** - `bf34e66` (feat)
 2. **Task 2: Update skill frontmatter and internal references** - `e8e9888` (feat)
 3. **Task 3: Update plugin manifest and embedded test scripts** - `b95bb44` (feat)
+4. **Gap fix: Update wizard.sh title expectation** - `605fbd3` (fix)
 
 **Plan metadata:** `bf34e66`
 
@@ -122,7 +123,7 @@ None - plan executed exactly as written, with the module path adjusted to `githu
 
 ## Issues Encountered
 
-None.
+- One remaining `Medtasker Skills Setup` string was found in `packages/claude-plugin/skills/run-stevmachine-skills/wizard.sh` during phase verification. Fixed in `605fbd3`.
 
 ## User Setup Required
 
