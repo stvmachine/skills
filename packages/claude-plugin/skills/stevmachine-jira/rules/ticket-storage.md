@@ -5,19 +5,19 @@ How fetched Jira tickets are stored locally. There are two backends — the skil
 | Condition | Backend | Storage location |
 |---|---|---|
 | `bd` (beads-mcp) is installed (`command -v bd`) | **Beads** — a SQLite-backed `bd` issue | The bead DB (typically `~/.beads/`) |
-| Otherwise | **Filesystem** | `${MEDTASKER_TICKET_DIR:-./.todo}/<TICKET-ID>/` |
+| Otherwise | **Filesystem** | `${STEVMACHINE_TICKET_DIR:-./.todo}/<TICKET-ID>/` |
 
-The user can also override by setting `MEDTASKER_FORCE_FILESYSTEM=1` to skip beads even when installed (useful in CI or one-off shells where `bd` exists but you don't want to write to its DB).
+The user can also override by setting `STEVMACHINE_FORCE_FILESYSTEM=1` to skip beads even when installed (useful in CI or one-off shells where `bd` exists but you don't want to write to its DB).
 
-To check which backend is active: `command -v bd && [ -z "$MEDTASKER_FORCE_FILESYSTEM" ] && echo beads || echo filesystem`.
+To check which backend is active: `command -v bd && [ -z "$STEVMACHINE_FORCE_FILESYSTEM" ] && echo beads || echo filesystem`.
 
-Both backends store the **same information**. Downstream consumers (medtasker-jira-ticket-transition, future skills) must check for both and prefer beads if found.
+Both backends store the **same information**. Downstream consumers (stevmachine-jira-ticket-transition, future skills) must check for both and prefer beads if found.
 
 ---
 
 ## Beads backend
 
-Used when `bd` (beads-mcp) is installed and `MEDTASKER_FORCE_FILESYSTEM` is not set.
+Used when `bd` (beads-mcp) is installed and `STEVMACHINE_FORCE_FILESYSTEM` is not set.
 
 ### Bead schema
 
@@ -35,19 +35,19 @@ A fetched ticket becomes one bead. Fields:
 ### Status mapping
 
 - **open** — fetched, ready for planning. Use this on initial inbox.
-- **in_progress** — work has started (set by `/medtasker-jira-ticket-transition review`).
-- **closed** — work completed and shipped to QA (set by `/medtasker-jira-ticket-transition qa`).
+- **in_progress** — work has started (set by `/stevmachine-jira-ticket-transition review`).
+- **closed** — work completed and shipped to QA (set by `/stevmachine-jira-ticket-transition qa`).
 
 ---
 
 ## Filesystem backend
 
-Used when `bd` (beads-mcp) is missing, or when `MEDTASKER_FORCE_FILESYSTEM=1`.
+Used when `bd` (beads-mcp) is missing, or when `STEVMACHINE_FORCE_FILESYSTEM=1`.
 
 ### Directory layout
 
 ```
-${MEDTASKER_TICKET_DIR:-./.todo}/
+${STEVMACHINE_TICKET_DIR:-./.todo}/
   <TICKET-ID>/
     TICKET_DESCRIPTION.md   # Single source-of-truth file (replaces bead notes)
     attachments/            # Downloaded attachments, if any
@@ -55,10 +55,10 @@ ${MEDTASKER_TICKET_DIR:-./.todo}/
 
 The default `./.todo/` is **project-local** (one ticket dir per branch/repo). Add `.todo/` to `.gitignore` — these are working notes, not source.
 
-`MEDTASKER_TICKET_DIR` can be an absolute path (`~/.medtasker-tickets/`) for global storage that follows you across repos. Persist by storing it in the dotenvx vault:
+`STEVMACHINE_TICKET_DIR` can be an absolute path (`~/.stevmachine-tickets/`) for global storage that follows you across repos. Persist by storing it in the dotenvx vault:
 
 ```bash
-medtasker-skills env set MEDTASKER_TICKET_DIR /Users/you/.medtasker-tickets
+stevmachine-skills env set STEVMACHINE_TICKET_DIR /Users/you/.stevmachine-tickets
 ```
 
 ### TICKET_DESCRIPTION.md schema
@@ -74,7 +74,7 @@ medtasker-skills env set MEDTASKER_TICKET_DIR /Users/you/.medtasker-tickets
 | **Assignee** | $ASSIGNEE |
 | **Priority** | P$PRIORITY |
 | **Labels** | $LABELS |
-| **Jira** | https://medtasker.atlassian.net/browse/$TICKET_ID |
+| **Jira** | https://example.atlassian.net/browse/$TICKET_ID |
 
 ## Description
 $RENDERED_DESCRIPTION
@@ -96,7 +96,7 @@ $ACCEPTANCE_CRITERIA
 $COMMENT_BODY
 ```
 
-The `**Status**` field in the metadata table is the local lifecycle state, mirroring the bead status values (`open`, `in_progress`, `closed`). Downstream skills (medtasker-jira-ticket-transition) update this field in place when transitioning.
+The `**Status**` field in the metadata table is the local lifecycle state, mirroring the bead status values (`open`, `in_progress`, `closed`). Downstream skills (stevmachine-jira-ticket-transition) update this field in place when transitioning.
 
 ---
 
@@ -133,7 +133,7 @@ Call `mcp__mcp-atlassian__jira_get_issue` with `fields="*all"` and `expand="rend
 
 A ticket is "ready for planning" when **all** of:
 
-1. A record exists for the ticket — either a bead with `label=<TICKET-ID>`, or a `${MEDTASKER_TICKET_DIR:-./.todo}/<TICKET-ID>/TICKET_DESCRIPTION.md` file.
+1. A record exists for the ticket — either a bead with `label=<TICKET-ID>`, or a `${STEVMACHINE_TICKET_DIR:-./.todo}/<TICKET-ID>/TICKET_DESCRIPTION.md` file.
 2. The record has non-empty content (notes / file body) with at least the metadata table and description.
 3. Status is `open` or `in_progress` (not `closed`).
 
@@ -141,7 +141,7 @@ Downstream skills check both backends in this order, returning the first hit:
 
 ```bash
 # Beads first (if available)
-if command -v bd >/dev/null 2>&1 && [ -z "$MEDTASKER_FORCE_FILESYSTEM" ]; then
+if command -v bd >/dev/null 2>&1 && [ -z "$STEVMACHINE_FORCE_FILESYSTEM" ]; then
     BEAD=$(bd query "label=$TICKET_ID" --sort updated --reverse --json | python3 -c "import sys,json; r=json.load(sys.stdin); print(r[0]['id'] if r else '')")
     if [ -n "$BEAD" ]; then
         echo "Found bead: $BEAD"
@@ -150,13 +150,13 @@ if command -v bd >/dev/null 2>&1 && [ -z "$MEDTASKER_FORCE_FILESYSTEM" ]; then
 fi
 
 # Filesystem fallback
-TICKET_DIR="${MEDTASKER_TICKET_DIR:-./.todo}/$TICKET_ID"
+TICKET_DIR="${STEVMACHINE_TICKET_DIR:-./.todo}/$TICKET_ID"
 if [ -f "$TICKET_DIR/TICKET_DESCRIPTION.md" ]; then
     echo "Found ticket file: $TICKET_DIR/TICKET_DESCRIPTION.md"
     exit 0
 fi
 
-echo "ERROR: no record for $TICKET_ID — run /medtasker-jira inbox $TICKET_ID"
+echo "ERROR: no record for $TICKET_ID — run /stevmachine-jira inbox $TICKET_ID"
 exit 1
 ```
 

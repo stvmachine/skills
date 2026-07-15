@@ -1,5 +1,5 @@
 ---
-name: medtasker-jira
+name: stevmachine-jira
 description: Connect code work to Jira tickets — inbox for gathering full ticket context, read context, update status, link PRs, and auto-detect ticket IDs from branch names.
 allowed-tools: mcp__mcp-atlassian__*, Bash(git *), Bash(curl *), Bash(file *), Bash(ls *), Bash(bd *), Read
 mcp_servers:
@@ -39,7 +39,7 @@ Connects code work to Jira tickets using the mcp-atlassian MCP server.
 ### 0. Ticket Inbox (NEW)
 Fetch a Jira ticket with full context and store it locally. The skill **auto-detects** the storage backend:
 - If `bd` (beads-mcp) is installed → store as a bead with full ticket context in `notes`.
-- Otherwise → store at `${MEDTASKER_TICKET_DIR:-./.todo}/<TICKET-ID>/TICKET_DESCRIPTION.md` (markdown file).
+- Otherwise → store at `${STEVMACHINE_TICKET_DIR:-./.todo}/<TICKET-ID>/TICKET_DESCRIPTION.md` (markdown file).
 
 See `rules/ticket-storage.md` for both backends' schemas, field mappings, and re-fetch semantics.
 See `rules/mcp-patterns.md` for retry policy, response validation, and credential extraction.
@@ -62,15 +62,15 @@ Extract Jira ticket IDs from git branch names automatically. Common patterns:
 
 ## Workflow
 
-### When invoked with `inbox` (`/medtasker-jira inbox MT-9548`)
+### When invoked with `inbox` (`/stevmachine-jira inbox MT-9548`)
 1. Validate ticket key format (pattern: `[A-Z]+-\d+`)
 2. **Detect the storage backend** (see `rules/ticket-storage.md`):
    ```bash
-   if command -v bd >/dev/null 2>&1 && [ -z "$MEDTASKER_FORCE_FILESYSTEM" ]; then
+   if command -v bd >/dev/null 2>&1 && [ -z "$STEVMACHINE_FORCE_FILESYSTEM" ]; then
        BACKEND=beads
    else
        BACKEND=filesystem
-       TICKET_DIR="${MEDTASKER_TICKET_DIR:-./.todo}/<TICKET-ID>"
+       TICKET_DIR="${STEVMACHINE_TICKET_DIR:-./.todo}/<TICKET-ID>"
    fi
    ```
 3. **Check for an existing record:**
@@ -92,32 +92,32 @@ Extract Jira ticket IDs from git branch names automatically. Common patterns:
 9. If using the filesystem backend, ensure `.todo/` (or the configured dir if inside the repo) is gitignored — these are local working notes, not source.
 10. Display summary of what was fetched and what failed (per `rules/mcp-patterns.md` partial-context resilience), including which backend was used
 
-### When invoked with `inbox update` (`/medtasker-jira inbox update MT-9548`)
+### When invoked with `inbox update` (`/stevmachine-jira inbox update MT-9548`)
 1. Detect backend (same as above).
 2. Find the existing record. Clear it destructively (per `rules/ticket-storage.md`) and re-run steps 4–8 of the `inbox` workflow.
 
-### When invoked without arguments (`/medtasker-jira`)
+### When invoked without arguments (`/stevmachine-jira`)
 1. Detect the current git branch
 2. Extract ticket ID from branch name (pattern: `[A-Z]+-\d+`)
 3. If found, fetch and display the ticket details
 4. If not found, ask the user for a ticket ID
 
-### When invoked with a ticket ID (`/medtasker-jira MT-9548`)
+### When invoked with a ticket ID (`/stevmachine-jira MT-9548`)
 1. Fetch and display the ticket details
 
-### When invoked with `update` (`/medtasker-jira update`)
+### When invoked with `update` (`/stevmachine-jira update`)
 1. Detect ticket ID from current branch
 2. Gather context: recent commits, current PR (if any via `gh pr view`)
 3. Post a comment to the ticket summarizing the work done
 4. Ask user if they want to transition the ticket status
 
-### When invoked with `link` (`/medtasker-jira link`)
+### When invoked with `link` (`/stevmachine-jira link`)
 1. Detect ticket ID from current branch
 2. Find the current PR via `gh pr view --json url`
 3. Add the PR URL as a comment on the Jira ticket
 4. Format: `PR: <url> — <pr title>`
 
-### When invoked with `start` (`/medtasker-jira start MT-9548`)
+### When invoked with `start` (`/stevmachine-jira start MT-9548`)
 1. Transition the ticket to "In Progress"
 2. Display the ticket details for context
 
@@ -194,7 +194,7 @@ List all subtasks with key, summary, and status.
 
 When posting comments to Jira, use **Markdown syntax** (not Jira wiki markup). The MCP server converts Markdown to Jira's ADF format automatically.
 
-**Always use the medtasker-jira-markup skill** for reference on correct formatting.
+**Always use the stevmachine-jira-markup skill** for reference on correct formatting.
 
 ### Quick Reference
 
@@ -214,7 +214,7 @@ When posting comments to Jira, use **Markdown syntax** (not Jira wiki markup). T
 ## Code Update
 
 **Branch:** `feature/MT-1234-fix`
-**PR:** [PR Title](https://github.com/nimblic/medtasker-app/pull/97)
+**PR:** [PR Title](https://github.com/your-org/your-repo/pull/97)
 
 **Commits:**
 1. Initial implementation
@@ -226,13 +226,13 @@ When posting comments to Jira, use **Markdown syntax** (not Jira wiki markup). T
 
 ### Full Formatting Guide
 
-For complete formatting reference, see the **medtasker-jira-markup skill**.
+For complete formatting reference, see the **stevmachine-jira-markup skill**.
 
 ## Status Transitions
 
 Common transitions to offer:
-- **To Do → In Progress**: When starting work (`/medtasker-jira start`)
-- **In Progress → In Review**: When PR is created (`/medtasker-jira link` or `/medtasker-jira update`)
+- **To Do → In Progress**: When starting work (`/stevmachine-jira start`)
+- **In Progress → In Review**: When PR is created (`/stevmachine-jira link` or `/stevmachine-jira update`)
 - **In Review → Done**: When PR is merged
 
 Always confirm with the user before transitioning status.
@@ -248,6 +248,6 @@ Always confirm with the user before transitioning status.
 Two rule files capture decisions that aren't derivable from the workflow above:
 
 - `rules/mcp-patterns.md` — retry counts and delays per service, MCP response validation, credential extraction from `~/.claude/mcp.json`, sequential-processing invariant.
-- `rules/ticket-storage.md` — backend auto-detect (beads-mcp if `bd` installed, else filesystem under `${MEDTASKER_TICKET_DIR:-./.todo}`), schemas for both, Jira→record field mapping, readiness contract for downstream consumers, re-fetch (destructive overwrite) semantics.
+- `rules/ticket-storage.md` — backend auto-detect (beads-mcp if `bd` installed, else filesystem under `${STEVMACHINE_TICKET_DIR:-./.todo}`), schemas for both, Jira→record field mapping, readiness contract for downstream consumers, re-fetch (destructive overwrite) semantics.
 
 Confluence/GitHub link processing is handled inline in the inbox workflow (steps 7–8). Figma integration is opt-in only — never fetched automatically.

@@ -1,5 +1,5 @@
 ---
-name: medtasker-jira-markup
+name: stevmachine-jira-markup
 description: Correct Jira comment formatting for use with mcp-atlassian MCP server. Use when writing or editing Jira comments to ensure proper formatting renders correctly in Jira Cloud. Essential companion to the jira skill for properly formatted comments.
 mcp_servers:
   - name: mcp-atlassian

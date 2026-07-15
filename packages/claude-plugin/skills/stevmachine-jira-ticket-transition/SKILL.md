@@ -1,5 +1,5 @@
 ---
-name: medtasker-jira-ticket-transition
+name: stevmachine-jira-ticket-transition
 description: Advance a Jira ticket through its lifecycle — ship to QA or send for peer review. Creates the PR if missing, transitions the Jira ticket to the chosen target, links the PR on the ticket, and updates the bead status. Use when the user says "ship", "ship to QA", "send to QA", "peer review", "send for review", "move to review", "ready for review", "create PR and update Jira", or wants to advance a branch through its lifecycle.
 allowed-tools: Bash(git *), Bash(gh *), Bash(curl *), Bash(python3 *), Bash(bd *), mcp__mcp-atlassian__*, mcp__github__*
 mcp_servers:
@@ -43,16 +43,16 @@ Single command to advance a feature branch through its lifecycle: commit (if nee
 
 **To add a new target:** add a row to this table. The rest of the workflow doesn't change. The dispatch happens at Step 5/6/7 by reading this table.
 
-**Local status** applies to whichever ticket storage backend medtasker-jira used (see medtasker-jira's `rules/ticket-storage.md`):
+**Local status** applies to whichever ticket storage backend stevmachine-jira used (see stevmachine-jira's `rules/ticket-storage.md`):
 - **Beads** (when `bd` — beads-mcp — is installed): `bd update <id> --status in_progress` or `bd close <id>`
-- **Filesystem** (default fallback): edit the `**Status**` field in `${MEDTASKER_TICKET_DIR:-./.todo}/<TICKET-ID>/TICKET_DESCRIPTION.md`
+- **Filesystem** (default fallback): edit the `**Status**` field in `${STEVMACHINE_TICKET_DIR:-./.todo}/<TICKET-ID>/TICKET_DESCRIPTION.md`
 
 ## Dependencies
 
 This skill orchestrates three other skills — invoke them, don't duplicate their logic:
 - **`/commit`** — used in Step 3 for properly formatted commits
-- **`/medtasker-jira`** — used in Step 5 for Jira transitions (and patterns for MCP usage, credential extraction)
-- **`/medtasker-jira-markup`** — used in Step 6 only, for formatting the comment that posts the PR link
+- **`/stevmachine-jira`** — used in Step 5 for Jira transitions (and patterns for MCP usage, credential extraction)
+- **`/stevmachine-jira-markup`** — used in Step 6 only, for formatting the comment that posts the PR link
 
 ## Pipeline Mode
 
@@ -80,9 +80,9 @@ Pipeline mode is an agent-to-agent invocation contract for cases where no human 
 
 Determine which target the user wants from the invocation arguments:
 
-- `/medtasker-jira-ticket-transition qa [TICKET-ID]` → `target = qa`
-- `/medtasker-jira-ticket-transition review [TICKET-ID]` → `target = review`
-- `/medtasker-jira-ticket-transition [TICKET-ID]` (no target) → prompt the user: "Move to which state? [qa | review]"
+- `/stevmachine-jira-ticket-transition qa [TICKET-ID]` → `target = qa`
+- `/stevmachine-jira-ticket-transition review [TICKET-ID]` → `target = review`
+- `/stevmachine-jira-ticket-transition [TICKET-ID]` (no target) → prompt the user: "Move to which state? [qa | review]"
 
 Reject any other target with: "Unknown target '<value>'. Valid targets: qa, review."
 
@@ -96,11 +96,11 @@ Look up the target row in the Targets table — that gives the transition keywor
 2. Extract Jira ticket ID from branch name using pattern `([A-Z][A-Z0-9]+-\d+)`
 3. Check for an existing ticket record (acceptance criteria for the PR body live here):
    - **Beads:** `bd query "label=MT-XXXX" --sort updated --reverse`
-   - **Filesystem:** test for `${MEDTASKER_TICKET_DIR:-./.todo}/MT-XXXX/TICKET_DESCRIPTION.md`
+   - **Filesystem:** test for `${STEVMACHINE_TICKET_DIR:-./.todo}/MT-XXXX/TICKET_DESCRIPTION.md`
 4. **Resolve the ticket ID:**
    - If a ticket ID was provided as argument, use it
    - If the branch has a ticket ID, use it
-   - Otherwise, list open ticket records — beads: `bd query "label=jira" --status open`; filesystem: `ls ${MEDTASKER_TICKET_DIR:-./.todo}/` and read each `**Status**` field. If exactly one is open, confirm; if multiple, ask; if zero, ask for the ticket ID directly.
+   - Otherwise, list open ticket records — beads: `bd query "label=jira" --status open`; filesystem: `ls ${STEVMACHINE_TICKET_DIR:-./.todo}/` and read each `**Status**` field. If exactly one is open, confirm; if multiple, ask; if zero, ask for the ticket ID directly.
 5. Run `git status` and `git diff --stat` to see what's pending
 6. Run `git log --oneline master..HEAD` to see all commits on this branch
 7. Determine the base branch — use `master` unless the branch name starts with `release/` (then find the parent release branch)
@@ -159,7 +159,7 @@ Try `gh` CLI first. If `gh` is not available or fails, fall back to GitHub MCP t
 <!-- Optional: Detailed explanation of changes -->
 
 ## JIRA Ticket
-[TICKET-ID](https://medtasker.atlassian.net/browse/TICKET-ID)
+[TICKET-ID](https://example.atlassian.net/browse/TICKET-ID)
 
 ## ACs
 <!-- Acceptance Criteria from the ticket -->
@@ -177,7 +177,7 @@ gh pr create --base <base-branch> --title "<gitmoji> <type>(<scope>): <short des
 <detailed description>
 
 ## JIRA Ticket
-[TICKET-ID](https://medtasker.atlassian.net/browse/TICKET-ID)
+[TICKET-ID](https://example.atlassian.net/browse/TICKET-ID)
 
 ## ACs
 - [ ] <acceptance criteria from ticket, if available>
@@ -193,21 +193,21 @@ EOF
 
 **PR content rules:**
 - PR title follows the same gitmoji conventional commit format as commits
-- If a local ticket record exists (bead or `${MEDTASKER_TICKET_DIR:-./.todo}/<TICKET-ID>/TICKET_DESCRIPTION.md`), read it for acceptance criteria to populate the PR body
+- If a local ticket record exists (bead or `${STEVMACHINE_TICKET_DIR:-./.todo}/<TICKET-ID>/TICKET_DESCRIPTION.md`), read it for acceptance criteria to populate the PR body
 - Base branch: use `master` by default, or the release branch if on a release/* sub-branch
 - Respect the repository's PR template structure if one exists
 
-### Step 4.5: Wait for Cloudflare Deployment (medtasker-frontends only)
+### Step 4.5: Wait for Cloudflare Deployment (your-project only)
 
-After the PR is created, check whether this is the medtasker-frontends project:
+After the PR is created, check whether this is the your-project project:
 
 ```bash
 git remote get-url origin
 ```
 
-If the remote URL does NOT contain `medtasker-frontends`, skip this step and set `CF_URL=""`. Continue to Step 5.
+If the remote URL does NOT contain `your-project`, skip this step and set `CF_URL=""`. Continue to Step 5.
 
-If the remote URL contains `medtasker-frontends`, **delegate the wait to a background agent** — do NOT block the main agent. Spawn a `general-purpose` subagent with the following instructions:
+If the remote URL contains `your-project`, **delegate the wait to a background agent** — do NOT block the main agent. Spawn a `general-purpose` subagent with the following instructions:
 
 > Poll `gh pr checks <PR_NUMBER> --json name,state,targetUrl` every 15 seconds for up to 10 minutes (40 attempts). Return the first `targetUrl` from a check whose name contains "cloudflare" (case-insensitive). If no URL is found after 40 attempts, return an empty string.
 
@@ -226,7 +226,7 @@ The main agent proceeds to Step 5 while the background agent waits. Before execu
 
 ### Step 6: Link PR on Jira Ticket
 
-Use the `/medtasker-jira-markup` skill's formatting rules and post the comment via `mcp__mcp-atlassian__jira_add_comment` — **Markdown syntax, not Jira wiki markup**. The mcp-atlassian server converts Markdown to ADF automatically.
+Use the `/stevmachine-jira-markup` skill's formatting rules and post the comment via `mcp__mcp-atlassian__jira_add_comment` — **Markdown syntax, not Jira wiki markup**. The mcp-atlassian server converts Markdown to ADF automatically.
 
 The comment should include:
 - The target's **Comment header** from the Targets table (e.g. "Ready for peer review" for `review`, "Shipped to QA" for `qa`)
@@ -237,7 +237,7 @@ The comment should include:
 
 ### Step 7: Update Local Ticket Status
 
-Look up the target's **Local status after** from the Targets table. Apply it via whichever backend stored this ticket (see medtasker-jira's `rules/ticket-storage.md`):
+Look up the target's **Local status after** from the Targets table. Apply it via whichever backend stored this ticket (see stevmachine-jira's `rules/ticket-storage.md`):
 
 **Beads** (when `bd` is installed):
 ```bash
@@ -248,9 +248,9 @@ bd update <bead-id> --status in_progress
 bd close <bead-id> --reason "Shipped to QA — PR: <PR_URL>"
 ```
 
-- **Filesystem** (when no beads-mcp, or `MEDTASKER_FORCE_FILESYSTEM=1`):
+- **Filesystem** (when no beads-mcp, or `STEVMACHINE_FORCE_FILESYSTEM=1`):
 ```bash
-FILE="${MEDTASKER_TICKET_DIR:-./.todo}/<TICKET-ID>/TICKET_DESCRIPTION.md"
+FILE="${STEVMACHINE_TICKET_DIR:-./.todo}/<TICKET-ID>/TICKET_DESCRIPTION.md"
 # Update the **Status** line in the metadata table to in_progress or closed.
 # Example with sed (BSD/macOS):
 sed -i '' -E 's/(\*\*Status\*\*[[:space:]]*\|).*/\1 in_progress |/' "$FILE"
@@ -279,11 +279,11 @@ Moved <TICKET-ID> to <target>:
 
 ## Invocation Patterns
 
-- `/medtasker-jira-ticket-transition qa` — ship to QA, auto-detect ticket from branch
-- `/medtasker-jira-ticket-transition qa MT-1234` — ship to QA for specific ticket
-- `/medtasker-jira-ticket-transition review` — send for peer review, auto-detect ticket
-- `/medtasker-jira-ticket-transition review MT-1234` — send for peer review for specific ticket
-- `/medtasker-jira-ticket-transition` — prompt the user for target, then auto-detect ticket
+- `/stevmachine-jira-ticket-transition qa` — ship to QA, auto-detect ticket from branch
+- `/stevmachine-jira-ticket-transition qa MT-1234` — ship to QA for specific ticket
+- `/stevmachine-jira-ticket-transition review` — send for peer review, auto-detect ticket
+- `/stevmachine-jira-ticket-transition review MT-1234` — send for peer review for specific ticket
+- `/stevmachine-jira-ticket-transition` — prompt the user for target, then auto-detect ticket
 
 ## Error Handling
 
