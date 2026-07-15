@@ -1,0 +1,11 @@
+{
+  "name": "medtasker-skills-claude",
+  "version": "1.0.0",
+  "description": "Medtasker skills for Claude Code",
+  "skills": [
+    "medtasker-jira",
+    "medtasker-jira-markup",
+    "medtasker-jira-ticket-transition",
+    "commit"
+  ]
+}

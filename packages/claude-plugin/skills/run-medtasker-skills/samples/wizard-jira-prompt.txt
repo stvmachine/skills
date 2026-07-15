@@ -1,0 +1,40 @@
+┃ JIRA_URL
+┃ > https://yourcompany.atlassian.net
+
+  JIRA_USERNAME
+  > you@example.com
+
+  JIRA_API_TOKEN
+  https://id.atlassian.com/manage-profile/security/api-tokens
+  >
+
+shift+tab back • enter next
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
