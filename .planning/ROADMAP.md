@@ -4,7 +4,7 @@
 
 | Phase | Status | Plans | Goal |
 |-------|--------|-------|------|
-| 1 | ○ | 5/5 | Rename and publish as `stevmachine-skills` |
+| 1 | ✓ | 5/5 | Rename and publish as `stevmachine-skills` |
 | 2 | ○ | 0/4 | Add OpenCode support |
 | 3 | ○ | 0/3 | Tooling improvements (v2) |
 
@@ -16,11 +16,11 @@
 
 **Plans:** 5 plans
 
-- [ ] `01-01-PLAN.md` — String sweep and code rename
-- [ ] `01-02-PLAN.md` — Package and asset rename
-- [ ] `01-03-PLAN.md` — Build and smoke test
-- [ ] `01-04-PLAN.md` — README and documentation rewrite
-- [ ] `01-05-PLAN.md` — GitHub publish
+- [x] `01-01-PLAN.md` — String sweep and code rename
+- [x] `01-02-PLAN.md` — Package and asset rename
+- [x] `01-03-PLAN.md` — Build and smoke test
+- [x] `01-04-PLAN.md` — README and documentation rewrite
+- [x] `01-05-PLAN.md` — GitHub publish
 
 **Success criteria:**
 
