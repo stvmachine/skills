@@ -4,7 +4,7 @@
 
 | Phase | Status | Plans | Goal |
 |-------|--------|-------|------|
-| 1 | ○ | 0/5 | Rename and publish as `stevmachine-skills` |
+| 1 | ○ | 5/5 | Rename and publish as `stevmachine-skills` |
 | 2 | ○ | 0/4 | Add OpenCode support |
 | 3 | ○ | 0/3 | Tooling improvements (v2) |
 
@@ -14,35 +14,13 @@
 
 **Covers requirements:** RENAME-01 through RENAME-06
 
-**Plans:**
+**Plans:** 5 plans
 
-1. **String sweep and code rename**
-   - Rename Go module path from `github.com/nimblic/medtasker-skills` to `github.com/stevmachine/skills` (or equivalent).
-   - Rename binary from `medtasker-skills` to `stevmachine-skills`.
-   - Rename vault directory from `~/.medtasker-skills` to `~/.stevmachine-skills`.
-   - Rename default skill packages from `medtasker-*` to `stevmachine-*`.
-   - Replace all `medtasker`, `Medtasker`, `nimblic` strings in `cmd/`, `internal/`, `packages/`, `scripts/`, `docs/`, `README.md`, `CLAUDE.md`, `go.mod`.
-
-2. **Package and asset rename**
-   - Rename embedded package directory under `packages/` if needed.
-   - Update `//go:embed` directives.
-   - Update scripts (`install.sh`, `verify-install.sh`, `smoke.sh`, `tapes/setup-flow.sh`) and docs.
-   - Replace or remove screenshots/assets that contain `medtasker` branding.
-
-3. **Build and smoke test**
-   - Build `stevmachine-skills` binary.
-   - Run `scripts/smoke.sh` (or equivalent) to verify install, list, doctor, and env workflows.
-   - Fix any regressions from the rename.
-
-4. **README and documentation rewrite**
-   - Rewrite `README.md` as `stevmachine-skills`.
-   - Update `DESIGN.md` to reflect the new project name and ownership.
-   - Update `CLAUDE.md` and any docs to remove employer references.
-
-5. **GitHub publish**
-   - Create GitHub repository `stevmachine/skills` (or `stevmachine-skills`).
-   - Add remote, push `main` branch.
-   - Verify clone-from-scratch instructions work.
+- [ ] `01-01-PLAN.md` — String sweep and code rename
+- [ ] `01-02-PLAN.md` — Package and asset rename
+- [ ] `01-03-PLAN.md` — Build and smoke test
+- [ ] `01-04-PLAN.md` — README and documentation rewrite
+- [ ] `01-05-PLAN.md` — GitHub publish
 
 **Success criteria:**
 - `go build -o stevmachine-skills ./cmd/stevmachine-skills` succeeds.
