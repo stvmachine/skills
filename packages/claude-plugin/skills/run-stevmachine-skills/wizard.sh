@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Drive `medtasker-skills env setup` (the huh wizard) end-to-end via tmux,
+# Drive `stevmachine-skills env setup` (the huh wizard) end-to-end via tmux,
 # choosing one of three canned profiles. Verifies the wizard actually wrote
-# encrypted ciphertext to ~/.medtasker-skills/.env in the isolated $HOME.
+# encrypted ciphertext to ~/.stevmachine-skills/.env in the isolated $HOME.
 #
 # Usage:
 #   wizard.sh                        # decline-all profile (no creds entered)
@@ -17,7 +17,7 @@ set -euo pipefail
 
 PROFILE="${1:-${PROFILE:-decline}}"
 
-# Same repo-finder as smoke.sh — walks up looking for the medtasker-skills go.mod.
+# Same repo-finder as smoke.sh — walks up looking for the stevmachine-skills go.mod.
 find_repo() {
   local src d
   src="${BASH_SOURCE[0]}"
@@ -28,7 +28,7 @@ find_repo() {
   fi
   d="$(cd "$(dirname "$src")" && pwd)"
   while [[ "$d" != "/" ]]; do
-    if [[ -f "$d/go.mod" ]] && grep -q '^module github.com/nimblic/medtasker-skills' "$d/go.mod"; then
+    if [[ -f "$d/go.mod" ]] && grep -q '^module github.com/stvmachine/skills' "$d/go.mod"; then
       echo "$d"; return 0
     fi
     d="$(dirname "$d")"
@@ -36,10 +36,10 @@ find_repo() {
   return 1
 }
 REPO_ROOT="$(find_repo || true)"
-[[ -z "$REPO_ROOT" ]] && REPO_ROOT="${MEDTASKER_REPO:-}"
+[[ -z "$REPO_ROOT" ]] && REPO_ROOT="${STEVMACHINE_REPO:-}"
 if [[ -z "$REPO_ROOT" || ! -f "$REPO_ROOT/go.mod" ]]; then
-  echo "wizard.sh: medtasker-skills source repo not found." >&2
-  echo "           Run from inside the repo, or set MEDTASKER_REPO=/path/to/medtasker-skills." >&2
+  echo "wizard.sh: stevmachine-skills source repo not found." >&2
+  echo "           Run from inside the repo, or set STEVMACHINE_REPO=/path/to/stevmachine-skills." >&2
   exit 1
 fi
 cd "$REPO_ROOT"
@@ -49,11 +49,11 @@ command -v tmux >/dev/null || { echo "tmux required (brew install tmux)" >&2; ex
 WIZ_DIR="$(mktemp -d -t mts-wizard.XXXXXX)"
 trap '[[ "${KEEP:-0}" == "1" ]] || { tmux kill-session -t mts-wiz 2>/dev/null || true; rm -rf "$WIZ_DIR"; }' EXIT
 WIZ_HOME="$WIZ_DIR/home"
-mkdir -p "$WIZ_HOME/.claude" "$WIZ_HOME/.medtasker-skills"
-chmod 700 "$WIZ_HOME/.medtasker-skills"
+mkdir -p "$WIZ_HOME/.claude" "$WIZ_HOME/.stevmachine-skills"
+chmod 700 "$WIZ_HOME/.stevmachine-skills"
 
-BIN="$WIZ_DIR/medtasker-skills"
-go build -o "$BIN" ./cmd/medtasker-skills
+BIN="$WIZ_DIR/stevmachine-skills"
+go build -o "$BIN" ./cmd/stevmachine-skills
 
 # tmux session helpers -------------------------------------------------------
 SESSION=mts-wiz
@@ -141,11 +141,11 @@ else
   else
     echo "✗ wizard summary missing 'Stored N variable(s)'"; exit 1
   fi
-  if grep -q '^JIRA_URL="encrypted:' "$WIZ_HOME/.medtasker-skills/.env"; then
+  if grep -q '^JIRA_URL="encrypted:' "$WIZ_HOME/.stevmachine-skills/.env"; then
     echo "✓ JIRA_URL written as ciphertext"
   else
     echo "✗ JIRA_URL not encrypted in .env"
-    cat "$WIZ_HOME/.medtasker-skills/.env" | sed 's/^/  | /'
+    cat "$WIZ_HOME/.stevmachine-skills/.env" | sed 's/^/  | /'
     exit 1
   fi
 fi
