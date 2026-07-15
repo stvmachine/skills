@@ -13,10 +13,11 @@ See: `.planning/PROJECT.md` (updated 2026-07-15)
 - Codebase mapped and analyzed in `.planning/codebase/`.
 - Repo moved from a nested home-directory worktree to a standalone repo at `/Users/estvmachine/Projects/personal/stevmachine-skills`.
 - Standalone git repo initialized on `main` branch.
+- Phase 1 planning complete: 5 plans created across 4 waves and committed.
 
 ## Next Action
 
-Run `/gsd-plan-phase 1` to plan Phase 1 execution.
+Run `/gsd-execute-phase 1` to execute the 5 Phase 1 plans.
 
 ## Important Notes
 
