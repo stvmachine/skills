@@ -31,11 +31,11 @@ func cmdDoctor() {
 	fmt.Println(statusLine("beads (bd)", optionalBoolStatus(bdErr == nil), "", labelWidth))
 	fmt.Println(statusLine("rtk", optionalBoolStatus(rtkErr == nil), "", labelWidth))
 
-	ticketDir := os.Getenv("MEDTASKER_TICKET_DIR")
+	ticketDir := os.Getenv("STEVMACHINE_TICKET_DIR")
 	if ticketDir == "" {
 		ticketDir = "./.todo (default)"
 	}
-	fmt.Println(statusLine("MEDTASKER_TICKET_DIR", "info", ticketDir, labelWidth))
+	fmt.Println(statusLine("STEVMACHINE_TICKET_DIR", "info", ticketDir, labelWidth))
 
 	fmt.Println()
 	printSuggestions(bdErr != nil, rtkErr != nil)

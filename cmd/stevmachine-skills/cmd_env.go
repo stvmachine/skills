@@ -18,7 +18,7 @@ func cmdEnvSet(args []string) {
 	_ = fs.Parse(args)
 	remaining := fs.Args()
 	if len(remaining) < 2 {
-		fmt.Fprintln(os.Stderr, "Usage: medtasker-skills env set [-e env] KEY VALUE")
+		fmt.Fprintln(os.Stderr, "Usage: stevmachine-skills env set [-e env] KEY VALUE")
 		os.Exit(1)
 	}
 	key, value := remaining[0], remaining[1]
@@ -141,7 +141,7 @@ func cmdEnvSetup() {
 	err := huh.NewForm(
 		huh.NewGroup(
 			huh.NewNote().
-				Title(titleStyle.Render("Medtasker Skills Setup")).
+				Title(titleStyle.Render("Stevmachine Skills Setup")).
 				Description("Select integrations and enter credentials.\nThey are encrypted with dotenvx and never stored plaintext."),
 		),
 		huh.NewGroup(
@@ -222,5 +222,5 @@ func cmdEnvSetup() {
 	fmt.Println()
 	fmt.Println(titleStyle.Render(fmt.Sprintf("Stored %d variable(s)", stored)))
 	fmt.Println("Launch Claude Code with:")
-	fmt.Println("  dotenvx run -f ~/.medtasker-skills/.env -- claude")
+	fmt.Println("  dotenvx run -f ~/.stevmachine-skills/.env -- claude")
 }

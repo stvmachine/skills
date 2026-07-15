@@ -9,7 +9,7 @@ import (
 
 func TestManagerPaths(t *testing.T) {
 	m := New()
-	if !strings.HasSuffix(m.EnvDir, ".medtasker-skills") {
+	if !strings.HasSuffix(m.EnvDir, ".stevmachine-skills") {
 		t.Fatalf("unexpected env dir: %s", m.EnvDir)
 	}
 

@@ -85,7 +85,7 @@ func (m installModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m installModel) View() string {
 	var b strings.Builder
 	b.WriteString("\n")
-	b.WriteString(titleStyle.Render("  Medtasker Skills") + "\n\n")
+	b.WriteString(titleStyle.Render("  Stevmachine Skills") + "\n\n")
 
 	for _, r := range m.results {
 		if r.ok {
@@ -164,7 +164,7 @@ func cmdInstall(args []string) {
 	if err != nil {
 		// non-TTY fallback: run installs and print plain output
 		fmt.Println()
-		fmt.Println(titleStyle.Render("  Medtasker Skills"))
+		fmt.Println(titleStyle.Render("  Stevmachine Skills"))
 		fmt.Println()
 		failed := 0
 		for _, skill := range skills {
@@ -202,7 +202,7 @@ func suggestOptionalDeps() {
 }
 
 func defaultSkills() []string {
-	return []string{"medtasker-jira", "medtasker-jira-markup", "medtasker-jira-ticket-transition", "commit"}
+	return []string{"stevmachine-jira", "stevmachine-jira-markup", "stevmachine-jira-ticket-transition", "commit"}
 }
 
 func doInstallOne(skillName, skillsDir string, mcpConfigs []string) (ok bool, servers []string, errMsg string) {

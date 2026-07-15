@@ -16,7 +16,7 @@ type Manager struct {
 func New() *Manager {
 	home, _ := os.UserHomeDir()
 	return &Manager{
-		EnvDir: filepath.Join(home, ".medtasker-skills"),
+		EnvDir: filepath.Join(home, ".stevmachine-skills"),
 	}
 }
 

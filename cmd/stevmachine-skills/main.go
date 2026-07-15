@@ -6,7 +6,7 @@ import (
 )
 
 func usage() {
-	fmt.Fprintln(os.Stderr, `Usage: medtasker-skills <command> [args]
+	fmt.Fprintln(os.Stderr, `Usage: stevmachine-skills <command> [args]
 Commands:
   install [skill ...]   Install skills (default: all)
   list                  List installed skills
