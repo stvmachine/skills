@@ -12,9 +12,14 @@ The whole tool does three things:
 
 ## Quick Start
 
-> **Note:** this is a public repo. The install path is **clone + build**, not a `curl | bash` or `go install` flow.
+> **Note:** This tool writes to your home directory and manages secrets. We recommend cloning and building so you can inspect what runs.
 
-Prereqs: [Go](https://go.dev/dl/), Node.js (for `dotenvx`), and Claude Code (`npm install -g @anthropic-ai/claude-code`).
+Prereqs:
+
+- [Go](https://go.dev/dl/)
+- [Node.js](https://nodejs.org/) (for `dotenvx`)
+- [dotenvx](https://github.com/dotenvx/dotenvx): `npm install -g @dotenvx/dotenvx`
+- [Claude Code](https://docs.claude.com/en/docs/claude-code): `npm install -g @anthropic-ai/claude-code`
 
 ```bash
 git clone git@github.com:stvmachine/skills.git
